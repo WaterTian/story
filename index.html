@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Stroy</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <style>
+            body {
+                font-family: Monospace;
+                background-color: #000000;
+                margin: 0px;
+                overflow: hidden;
+            }
+            audio {
+                position: absolute;
+                left: 60px;
+                right: 60px;
+                bottom: 20px;
+                z-index: 100;
+                text-align: center;
+                width: calc(100% - 120px);
+            }
+
+            #loading, #start{
+                position: absolute;
+                left: 0;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                background-color: black;
+                color: white;
+            }
+            #loading p, #start p{
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                text-align: center;
+                transform: translate3d(-50%,-50%,0);
+            }
+            #start{
+                cursor: pointer;
+                display:none;
+            }
+            audio{
+                opacity: 0;
+                transition: opacity 250ms ease-out;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div id="webglContainer"></div>
+        <div id="loading" ><p>Loading..</p></div>
+        <div id="start" ><p>Click to Start</p></div>
+        <script src="dist/app.js?v=0.0.1"></script>
+    </body>
+</html>
