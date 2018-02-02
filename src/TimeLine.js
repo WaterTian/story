@@ -16,6 +16,22 @@ export default class TimeLine {
     this.skyColorScript = skyColorScript;
 
 
+    var cameraScript = new Script();
+    cameraScript.addKeyframe( {x:0,y:1.1,z:-2,tx:0,ty:-1,tz:.01},0);
+    cameraScript.addKeyframe( {x:0,y:1.3,z:-2.5,tx:0,ty:-1,tz:.01},2);
+    cameraScript.addKeyframe( {x:0,y:1.3,z:-2.5,tx:0,ty:-1,tz:1},6);
+    cameraScript.addKeyframe( {x:0,y:1.3,z:-2.5,tx:0,ty:-1,tz:1},20);
+    cameraScript.addKeyframe( {x:0,y:1.3,z:-2.5,tx:0,ty:0,tz:1},24);
+    cameraScript.addKeyframe( {x:0,y:1.1,z:-3,tx:0,ty:.5,tz:1},39);
+    cameraScript.addKeyframe( {x:0,y:1.1,z:-3,tx:0,ty:0,tz:1},41);
+    cameraScript.addKeyframe( {x:0,y:1.1,z:-4.5,tx:0,ty:0,tz:1},70);
+    cameraScript.addKeyframe( {x:0,y:2,z:-3,tx:0,ty:0,tz:1},128);
+    cameraScript.addKeyframe( {x:0,y:2,z:-3,tx:0,ty:10,tz:1},133);
+    cameraScript.addKeyframe( {x:0,y:2,z:-3,tx:0,ty:10,tz:1},200);
+    this.cameraScript = cameraScript;
+
+
+
     var snowScript = new Script();
     snowScript.addKeyframe({persistence: .8, speed: .001, scale: .01, delta:1, opacity:.4},0);
     snowScript.addKeyframe({persistence: .8, speed: .001, scale: .01, delta:1, opacity:.4},38);

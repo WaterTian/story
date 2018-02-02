@@ -9,8 +9,18 @@ export default class Particles {
   constructor(renderer) {
     var width = 256;
     var height = 256;
-
     var NUM_POINTS = width * height;
+
+    var params = {
+      decay: .1,
+      persistence: .1,
+      speed: .05,
+      spread: 10,
+      scale: .03,
+      taper: 0,
+      opacity: .5
+    }
+
 
     var positions = new THREE.WebGLRenderTarget(1, 1, {
       wrapS: THREE.ClampToEdgeWrapping,
@@ -47,9 +57,10 @@ export default class Particles {
         ptr += 4;
       }
     }
-
-    var curPos = new THREE.DataTexture(cur, width, height, THREE.RGBAFormat, floatType);
-    var prevPos = new THREE.DataTexture(prev, width, height, THREE.RGBAFormat, floatType);
+    
+    ///mouse be THREE.FloatType
+    var curPos = new THREE.DataTexture(cur, width, height, THREE.RGBAFormat, THREE.FloatType);
+    var prevPos = new THREE.DataTexture(prev, width, height, THREE.RGBAFormat, THREE.FloatType);
     curPos.needsUpdate = true;
     prevPos.needsUpdate = true;
 
@@ -71,12 +82,11 @@ export default class Particles {
     particleGeometry.addAttribute('offset', new THREE.InstancedBufferAttribute(new Float32Array(pData), 3));
 
     var snowTexture = new THREE.TextureLoader().load('./assets/snow.png');
-    snowTexture.wrapS = snowTexture.wrapT = THREE.ClampToEdgeWrapping;
 
     var snowMaterial = new THREE.RawShaderMaterial({
       uniforms: {
         scale: {
-          value: .1
+          value: params.scale
         },
         dimensions: {
           value: new THREE.Vector2(width, height)
@@ -120,6 +130,7 @@ export default class Particles {
     this.snow.position.y = 5;
     this.snow.position.z = 5;
 
+
     var snowSimulationShader = new THREE.RawShaderMaterial({
       uniforms: {
         source: {
@@ -141,10 +152,10 @@ export default class Particles {
           value: .5
         },
         spread: {
-          value: .5
+          value: params.spread
         },
         decay: {
-          value: .5
+          value: params.decay
         },
         delta: {
           value: 0
@@ -158,24 +169,17 @@ export default class Particles {
 
   }
 
-  render(t, delta, percent) {
-    var svalues = {
-      persistence: .8,
-      speed: .001,
-      scale: .01,
-      delta: 1,
-      opacity: .4
-    };
+  render(t, delta, percent , snowValues) {
 
-    this.snowSimulation.shader.uniforms.persistence.value = svalues.persistence;
-    this.snowSimulation.shader.uniforms.speed.value = svalues.speed;
-    this.snow.material.uniforms.scale.value = svalues.scale;
-    this.snow.material.uniforms.delta.value = svalues.delta;
-    this.snow.material.uniforms.opacity.value = svalues.opacity;
+    this.snowSimulation.shader.uniforms.persistence.value = snowValues.persistence;
+    this.snowSimulation.shader.uniforms.speed.value = snowValues.speed;
+
+    // this.snow.material.uniforms.scale.value = snowValues.scale;
+    this.snow.material.uniforms.delta.value = snowValues.delta;
+    this.snow.material.uniforms.opacity.value = snowValues.opacity;
 
 
-    this.snowSimulation.shader.uniforms.decay.value = .1;
-    this.snowSimulation.shader.uniforms.spread.value = 10;
+
     this.snowSimulation.shader.uniforms.time.value = t;
     this.snowSimulation.shader.uniforms.delta.value = delta / (1 / 60.);
     this.snowSimulation.render();
@@ -184,6 +188,5 @@ export default class Particles {
 
 
     this.snow.geometry.setDrawRange(0, Math.floor(this.snow.geometry.maxInstancedCount * percent));
-    this.snow.material.uniforms.scale.value = .025;
   }
 }

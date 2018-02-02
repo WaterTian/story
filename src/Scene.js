@@ -19,17 +19,16 @@ const Particles = require('./Particles').default;
 
 window.floatType = isMobile.any ? THREE.HalfFloatType : THREE.FloatType;
 
-
 var That;
 
 var fxaaTexture, finalTexture;
 var baseFBO;
 var bloom;
-var resolution = new THREE.Vector2();
+var resolution = new THREE.Vector2(0,0);
 
 var dummy;
 var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
+var mouse = new THREE.Vector2(0,0);
 var intersectionPlane;
 
 var windowHalfX = window.innerWidth / 2;
@@ -37,7 +36,7 @@ var windowHalfY = window.innerHeight / 2;
 
 
 var track = new Audio();
-var globalSpeed = .6;
+var globalSpeed = .45;
 var lastTrackTime = 0;
 var t = 0;
 var lastTime = 0;
@@ -51,10 +50,12 @@ export default class Scene {
 	}
 
 	init() {
+		this.vconsole = new VConsole();
+
 		this.stats = new Stats();
 		document.body.appendChild(this.stats.dom);
 
-		this.vconsole = new VConsole();
+
 
 		this.camera;
 		this.scene;
@@ -73,7 +74,7 @@ export default class Scene {
 			premultipliedAlpha: false
 		});
 		this.renderer.setClearColor(0x0);
-		// this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.sortObjects = true;
 		this.renderer.shadowMap.enabled = true;
@@ -82,25 +83,31 @@ export default class Scene {
 		this.container = document.getElementById('webglContainer');
 		this.container.appendChild(this.renderer.domElement);
 
-		// controls
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-		this.controls.update();
+
+		// // controls
+		// this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+		// this.controls.update();
 
 		this.helper = new FBOHelper(this.renderer);
 
 		window.addEventListener('resize', this.onWindowResized);
 		window.addEventListener('mousemove', this.onDocumentMouseMove);
-
+		this.renderer.domElement.addEventListener('touchmove', this.onDocumentTouchMove);
 
 		this.initScene();
 		this.animate();
 		this.onWindowResized();
 	}
 
-
 	onDocumentMouseMove(event) {
 		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+	}
+	onDocumentTouchMove(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
+		mouse.y = -(event.touches[0].clientY / window.innerHeight) * 2 + 1;
 	}
 	onWindowResized(event) {
 		var w = window.innerWidth;
@@ -112,7 +119,7 @@ export default class Scene {
 		That.camera.aspect = w / h;
 		That.camera.updateProjectionMatrix();
 
-		var dPR = .5 * window.devicePixelRatio;
+		var dPR = window.devicePixelRatio * 0.5;
 		bloom.setSize(w * dPR, h * dPR);
 		resolution.set(w * dPR, h * dPR);
 		baseFBO.setSize(w * dPR, h * dPR);
@@ -136,9 +143,9 @@ export default class Scene {
 			startDiv.removeEventListener('click', startPlaying);
 			startDiv.style.display = 'none';
 			track.play();
-			track.volume = 0.1;
+			track.volume = 0.01;
 		}
-		startPlaying();
+		if (!isMobile.any) startPlaying();
 
 
 
@@ -171,6 +178,7 @@ export default class Scene {
 		dummy.userData.name = 'Dummy';
 		That.scene.add(dummy);
 
+
 		baseFBO = new THREE.WebGLRenderTarget(1, 1, {
 			wrapS: THREE.ClampToEdgeWrapping,
 			wrapT: THREE.ClampToEdgeWrapping,
@@ -181,11 +189,11 @@ export default class Scene {
 			stencilBuffer: false,
 			depthBuffer: true
 		});
-
 		baseFBO.generateMipMaps = false;
 		baseFBO.flipY = true;
 
 		bloom = new Bloom(5, baseFBO);
+
 		var fxaaShader = new THREE.RawShaderMaterial({
 			uniforms: {
 				inputTexture: {
@@ -259,14 +267,22 @@ export default class Scene {
 
 
 		var renderCamera = this.camera;
-		renderCamera.updateMatrix();
-		renderCamera.updateMatrixWorld();
+
+		if (!this.controls) {
+			var cameraValues = timeLine.getValues(timeLine.cameraScript, trackTime);
+			renderCamera.position.set(cameraValues.x, cameraValues.y, cameraValues.z);
+			renderCamera.target.set(cameraValues.x + cameraValues.tx, cameraValues.y + cameraValues.ty, cameraValues.z + cameraValues.tz);
+			renderCamera.lookAt(renderCamera.target);
+			renderCamera.updateMatrix();
+			renderCamera.updateMatrixWorld();
+		}
+
 
 		raycaster.setFromCamera(mouse, renderCamera);
 		intersectionPlane.lookAt(renderCamera.position);
 		var intersects = raycaster.intersectObject(intersectionPlane);
 
-		if (intersects.length && trackTime > 20) {
+		if (intersects.length && trackTime > 10) {
 			dummy.position.copy(intersects[0].point);
 			dummy.position.y = Math.max(dummy.position.y, 1);
 		}
@@ -275,9 +291,12 @@ export default class Scene {
 		var skyColor = timeLine.getValues(timeLine.skyColorScript, trackTime);
 		var clearColor = Math.round(skyColor.r) * 256 * 256 + Math.round(skyColor.g) * 256 + Math.round(skyColor.b);
 		this.renderer.setClearColor(clearColor, 1.);
-		var trailColor = timeLine.getValues(timeLine.trailColorScript, trackTime);
 
+		var trailColor = timeLine.getValues(timeLine.trailColorScript, trackTime);
 		var backdropValues = timeLine.getValues(timeLine.backdropScript, trackTime);
+		var snowValues = timeLine.getValues(timeLine.snowScript, trackTime);
+
+		dummy.material.uniforms.color.value.setHex(Math.round(trailColor.r) * 256 * 256 + Math.round(trailColor.g) * 256 + Math.round(trailColor.b));
 
 
 		if (this.stats) this.stats.update();
@@ -285,15 +304,16 @@ export default class Scene {
 
 		if (this.backdrop) this.backdrop.render(t, backdropValues);
 		if (this.ground) this.ground.render(this.renderer, t, dummy.position, skyColor, trailColor);
-		if (this.particles) this.particles.render(t, delta, percent);
+		if (this.particles) this.particles.render(t, delta, percent , snowValues);
 
 
 
 		this.renderer.render(this.scene, renderCamera, baseFBO);
 
-
-		finalTexture.shader.uniforms.overall.value = 1;
 		bloom.render(this.renderer);
+
+		var finalValues = timeLine.getValues(timeLine.lightScript, trackTime);
+		finalTexture.shader.uniforms.overall.value = finalValues.overall;
 		fxaaTexture.render();
 		finalTexture.shader.uniforms.inputTexture.value = fxaaTexture.fbo.texture;
 		finalTexture.render(true);

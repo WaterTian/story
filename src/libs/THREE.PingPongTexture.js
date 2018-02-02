@@ -8,6 +8,7 @@ export default class PingPongTexture {
 		this.renderer = renderer;
 		this.shader = shader;
 		this.orthoScene = new THREE.Scene();
+
 		var fbo = new THREE.WebGLRenderTarget(width, height, {
 			wrapS: THREE.RepeatWrapping,
 			wrapT: THREE.RepeatWrapping,
@@ -16,17 +17,23 @@ export default class PingPongTexture {
 			format: format || THREE.RGBAFormat,
 			type: type || THREE.UnsignedByte
 		});
+
+
 		this.target = 0;
-		this.buffersCount = buffersCount || 2;
+		this.buffersCount = 2;
 		this.targets = [];
 		this.targets.push(fbo);
 		for (var j = 1; j < this.buffersCount; j++) {
 			this.targets.push(fbo.clone());
 		}
 		this.orthoCamera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, .00001, 1000);
+
+
 		var geometry = new THREE.BufferGeometry();
-		var vertices = new Float32Array([-1.0, -1.0, 0.0,
-			3.0, -1.0, 0.0, -1.0, 3.0, 0.0,
+		var vertices = new Float32Array([
+			-1.0, -1.0, 0.0,
+			3.0, -1.0, 0.0, 
+			-1.0, 3.0, 0.0,
 		]);
 		var uvs = new Float32Array([
 			0.0, 0.0,
@@ -35,6 +42,7 @@ export default class PingPongTexture {
 		]);
 		geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
 		geometry.addAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+
 
 		this.orthoQuad = new THREE.Mesh(geometry, this.shader);
 		this.orthoQuad.scale.set(width, height, 1);

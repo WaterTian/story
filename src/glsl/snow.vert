@@ -59,7 +59,7 @@ void main() {
 
 	vec4 mVP = modelViewMatrix * vec4(lp.xyz,1.);
 	mVP.xy += ( dir.xy * position.x + perp.xy * position.y ) * scale;// * (lp.w/100.);
-	//mVP.xy += position.xy * scale;
+	// mVP.xy += position.xy * scale;
 
 	//if( lpp.w < lp.w ) p.x = 1000000.;
 

@@ -54,5 +54,6 @@ void main() {
 	if( levels > 4. ) bloom += texture2D( level4, vUv );
 
 	vec4 color = texture2D( base, vUv );
-	gl_FragColor = color+bloom;//vec4( blendOverlay(color.xyz, bloom.xyz,.5), 1.);
+	gl_FragColor = color+bloom;
+	//vec4( blendOverlay(color.xyz, bloom.xyz,.5), 1.);
 }
