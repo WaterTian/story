@@ -1,6 +1,6 @@
 const THREE = require('three');
 const glslify = require('glslify');
-const ShaderTexture = require('./THREE.ShaderTexture').default;
+const ShaderTexture = require('./libs/THREE.ShaderTexture').default;
 
 
 export default class Ground {
@@ -172,11 +172,11 @@ export default class Ground {
 
   }
 
-  render(renderer,dt,lightPosition) {
+  render(renderer,t,lightPosition,backgroundColor,trailColor) {
 
     for (var j = 0; j < this.footprints.length; j++ ) {
       var f = this.footprints[j];
-      var s = f.z + dt;
+      var s = f.z + t;
       s %= 10;
       f.mesh.position.x = -f.x;
       f.mesh.position.z = -s;
@@ -184,16 +184,16 @@ export default class Ground {
       f.mesh.material.uniforms.offset.value.y = s;
     }
 
+    var bC = Math.round(backgroundColor.r) * 256 * 256 + Math.round(backgroundColor.g) * 256 + Math.round(backgroundColor.b);
+    this.plane.material.uniforms.backgroundColor.value.setHex(bC);
 
-
-    this.terrainTexture.shader.uniforms.time.value += dt;
+    this.terrainTexture.shader.uniforms.time.value = t;
     this.terrainTexture.render();
 
-    this.plane.material.uniforms.time.value += dt;
+    this.plane.material.uniforms.time.value = t;
     this.shadowTexture.shader.uniforms.lightPosition.value.copy(lightPosition);
     this.shadowTexture.shader.uniforms.pos.value = this.terrainTexture.shader.uniforms.time.value;
 
-    var trailColor ={r:0xff,g:0xff,b:0xff};
     var tC = Math.round(trailColor.r) * 256 * 256 + Math.round(trailColor.g) * 256 + Math.round(trailColor.b);
     this.shadowTexture.shader.uniforms.lightColor.value.setHex(tC);
 

@@ -32,8 +32,8 @@ export default class Bloom {
           value: 1.
         }
       },
-      vertexShader: glslify('./glsl/ortho.vert'),
-      fragmentShader: glslify('./glsl/highlight.frag'),
+      vertexShader: glslify('../glsl/ortho.vert'),
+      fragmentShader: glslify('../glsl/highlight.frag'),
     });
 
     this.blurShader = new THREE.RawShaderMaterial({
@@ -48,8 +48,8 @@ export default class Bloom {
           value: new THREE.Vector2(0, 1)
         }
       },
-      vertexShader: glslify('./glsl/ortho.vert'),
-      fragmentShader: glslify('./glsl/blur.frag'),
+      vertexShader: glslify('../glsl/ortho.vert'),
+      fragmentShader: glslify('../glsl/blur.frag'),
     });
 
     this.bloomShader = new THREE.RawShaderMaterial({
@@ -91,8 +91,8 @@ export default class Bloom {
           value: 0
         },
       },
-      vertexShader: glslify('./glsl/ortho.vert'),
-      fragmentShader: glslify('./glsl/bloom.frag'),
+      vertexShader: glslify('../glsl/ortho.vert'),
+      fragmentShader: glslify('../glsl/bloom.frag'),
     });
 
     this.orthoScene = new THREE.Scene();

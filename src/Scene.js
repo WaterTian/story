@@ -4,20 +4,23 @@ const TweenMax = require('gsap');
 const OrbitControls = require('three-orbit-controls')(THREE);
 const Stats = require('stats.js');
 const dat = require('dat-gui');
+const VConsole = require('vconsole');
 
-const FBOHelper = require('./THREE.FBOHelper');
-const Bloom = require('./THREE.Bloom').default;
-const ShaderTexture = require('./THREE.ShaderTexture').default;
 
+const isMobile = require('./libs/isMobile.min.js');
+const FBOHelper = require('./libs/THREE.FBOHelper');
+const Bloom = require('./libs/THREE.Bloom').default;
+const ShaderTexture = require('./libs/THREE.ShaderTexture').default;
+
+const TimeLine = require('./TimeLine').default;
 const Ground = require('./Ground').default;
 const Backdrop = require('./Backdrop').default;
+const Particles = require('./Particles').default;
 
+window.floatType = isMobile.any ? THREE.HalfFloatType : THREE.FloatType;
 
 
 var That;
-var clock = new THREE.Clock();
-
-var track = new Audio();
 
 var fxaaTexture, finalTexture;
 var baseFBO;
@@ -32,6 +35,15 @@ var intersectionPlane;
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
 
+
+var track = new Audio();
+var globalSpeed = .6;
+var lastTrackTime = 0;
+var t = 0;
+var lastTime = 0;
+
+var timeLine = new TimeLine();
+
 export default class Scene {
 	constructor() {
 		That = this;
@@ -41,6 +53,8 @@ export default class Scene {
 	init() {
 		this.stats = new Stats();
 		document.body.appendChild(this.stats.dom);
+
+		this.vconsole = new VConsole();
 
 		this.camera;
 		this.scene;
@@ -79,7 +93,6 @@ export default class Scene {
 
 
 		this.initScene();
-		clock.start();
 		this.animate();
 		this.onWindowResized();
 	}
@@ -122,17 +135,22 @@ export default class Scene {
 		function startPlaying() {
 			startDiv.removeEventListener('click', startPlaying);
 			startDiv.style.display = 'none';
-			// track.play();
+			track.play();
+			track.volume = 0.1;
 		}
 		startPlaying();
 
 
 
 		That.backdrop = new Backdrop();
-		That.scene.add(That.backdrop.obj);
+		That.scene.add(That.backdrop.backdrop);
 
 		That.ground = new Ground(this.renderer, this.helper);
 		That.scene.add(That.ground.obj);
+
+		That.particles = new Particles(this.renderer);
+		That.scene.add(That.particles.snow);
+
 
 
 		dummy = new THREE.Mesh(
@@ -157,7 +175,7 @@ export default class Scene {
 			wrapS: THREE.ClampToEdgeWrapping,
 			wrapT: THREE.ClampToEdgeWrapping,
 			format: THREE.RGBAFormat,
-			type: THREE.FloatType,
+			type: floatType,
 			minFilter: THREE.LinearFilter,
 			magFilter: THREE.LinearFilter,
 			stencilBuffer: false,
@@ -228,14 +246,17 @@ export default class Scene {
 	animate() {
 		requestAnimationFrame(this.animate.bind(this));
 
-		let deltaTime = clock.getDelta();
-		this.render(deltaTime);
+		this.render();
 	}
 
 
 	// main animation loop
-	render(dt) {
+	render() {
 		var trackTime = track.currentTime;
+		t += globalSpeed * (trackTime - lastTrackTime);
+		var delta = t - lastTime;
+		var percent = trackTime / track.duration;
+
 
 		var renderCamera = this.camera;
 		renderCamera.updateMatrix();
@@ -245,22 +266,26 @@ export default class Scene {
 		intersectionPlane.lookAt(renderCamera.position);
 		var intersects = raycaster.intersectObject(intersectionPlane);
 
-		if (intersects.length) {
+		if (intersects.length && trackTime > 20) {
 			dummy.position.copy(intersects[0].point);
 			dummy.position.y = Math.max(dummy.position.y, 1);
 		}
 
-		
+
+		var skyColor = timeLine.getValues(timeLine.skyColorScript, trackTime);
+		var clearColor = Math.round(skyColor.r) * 256 * 256 + Math.round(skyColor.g) * 256 + Math.round(skyColor.b);
+		this.renderer.setClearColor(clearColor, 1.);
+		var trailColor = timeLine.getValues(timeLine.trailColorScript, trackTime);
+
+		var backdropValues = timeLine.getValues(timeLine.backdropScript, trackTime);
+
 
 		if (this.stats) this.stats.update();
 		if (this.helper) this.helper.update();
 
-		if (this.backdrop) this.backdrop.render(dt);
-		if (this.ground) this.ground.render(this.renderer, 0 ,dummy.position);
-
-
-
-
+		if (this.backdrop) this.backdrop.render(t, backdropValues);
+		if (this.ground) this.ground.render(this.renderer, t, dummy.position, skyColor, trailColor);
+		if (this.particles) this.particles.render(t, delta, percent);
 
 
 
@@ -268,13 +293,21 @@ export default class Scene {
 
 
 		finalTexture.shader.uniforms.overall.value = 1;
-
 		bloom.render(this.renderer);
 		fxaaTexture.render();
 		finalTexture.shader.uniforms.inputTexture.value = fxaaTexture.fbo.texture;
 		finalTexture.render(true);
+
+
+		lastTime = t;
+		lastTrackTime = trackTime;
 	}
 
-
+	// setBackgroundColor(r, g, b) {
+	// 	var c = Math.round(r) * 256 * 256 + Math.round(g) * 256 + Math.round(b);
+	// 	this.renderer.setClearColor(c, 1.);
+	// 	plane.material.uniforms.backgroundColor.value.setHex(c);
+	// 	sphereMaterial.uniforms.backgroundColor.value.setHex(c);
+	// }
 
 }
