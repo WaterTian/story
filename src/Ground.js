@@ -177,8 +177,7 @@ export default class Ground {
       f.mesh.material.uniforms.offset.value.y = s;
     }
 
-    var bC = Math.round(backgroundColor.r) * 256 * 256 + Math.round(backgroundColor.g) * 256 + Math.round(backgroundColor.b);
-    this.plane.material.uniforms.backgroundColor.value.setHex(bC);
+    this.plane.material.uniforms.backgroundColor.value.setHex(backgroundColor);
 
     this.terrainTexture.shader.uniforms.time.value = t;
     this.terrainTexture.render();

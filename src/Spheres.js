@@ -40,6 +40,8 @@ export default class Spheres {
     this.sphereOriginal = [];
     this.sphereMaterial;
 
+    this.sphereSnowValues = {};
+
     var palette = [
       new THREE.Color(0xf11d1d),
       new THREE.Color(0xb7db55),
@@ -164,7 +166,7 @@ export default class Spheres {
     return beats;
   }
 
-  render(trackTime,t,particles) {
+  render(trackTime, t, backgroundColor) {
     var tt = Math.max(0, trackTime - 94);
     var v = tt / 30;
     this.sphereGroup.material.uniforms.emissive.value = v;
@@ -179,11 +181,12 @@ export default class Spheres {
       var v = Maf.parabola(b[j].l, 3);
       this.sphereLight[ptr] = v;
       this.sphereGroup.geometry.attributes.color.array[ptr] = 1;
+
       ///
-      particles.snowSimulation.shader.uniforms.persistence.value = 1 + v * .5;
-      particles.snowSimulation.shader.uniforms.speed.value = .002 + .004 * v;
-      particles.snow.material.uniforms.delta.value = 1 + 1 * v;
-      particles.snow.material.uniforms.opacity.value = .8;
+      this.sphereSnowValues.persistence = 1 + v * .5;
+      this.sphereSnowValues.speed = .002 + .004 * v;
+      this.sphereSnowValues.delta = 1 + 1 * v;
+      this.sphereSnowValues.opacity = .8;
       ////
     }
     this.sphereGroup.geometry.attributes.color.needsUpdate = true;
@@ -196,6 +199,8 @@ export default class Spheres {
     this.sphereGroup.geometry.attributes.offset.needsUpdate = true;
 
     this.sphereGroup.position.z = -t;
+
+    this.sphereMaterial.uniforms.backgroundColor.value.setHex(backgroundColor);
 
   }
 }

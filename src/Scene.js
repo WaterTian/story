@@ -25,11 +25,11 @@ var That;
 var fxaaTexture, finalTexture;
 var baseFBO;
 var bloom;
-var resolution = new THREE.Vector2(0,0);
+var resolution = new THREE.Vector2(0, 0);
 
 var dummy;
 var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2(0,0);
+var mouse = new THREE.Vector2(0, 0);
 var intersectionPlane;
 
 var windowHalfX = window.innerWidth / 2;
@@ -51,10 +51,10 @@ export default class Scene {
 	}
 
 	init() {
-		this.vconsole = new VConsole();
+		// this.vconsole = new VConsole();
 
 		this.stats = new Stats();
-		document.body.appendChild(this.stats.dom);
+		// document.body.appendChild(this.stats.dom);
 
 
 
@@ -126,6 +126,8 @@ export default class Scene {
 		baseFBO.setSize(w * dPR, h * dPR);
 		fxaaTexture.setSize(w * dPR, h * dPR);
 		finalTexture.setSize(w * dPR, h * dPR);
+
+		That.particles.snow.material.uniforms.resolution.value.set(w, h);
 	}
 
 
@@ -144,7 +146,8 @@ export default class Scene {
 			startDiv.removeEventListener('click', startPlaying);
 			startDiv.style.display = 'none';
 			track.play();
-			track.volume = 0.01;
+			// track.volume = 0.01;
+			// track.currentTime = 90;
 		}
 		if (!isMobile.any) startPlaying();
 
@@ -291,8 +294,8 @@ export default class Scene {
 
 
 		var skyColor = timeLine.getValues(timeLine.skyColorScript, trackTime);
-		var clearColor = Math.round(skyColor.r) * 256 * 256 + Math.round(skyColor.g) * 256 + Math.round(skyColor.b);
-		this.renderer.setClearColor(clearColor, 1.);
+		var backgroundColor = Math.round(skyColor.r) * 256 * 256 + Math.round(skyColor.g) * 256 + Math.round(skyColor.b);
+		this.renderer.setClearColor(backgroundColor, 1.);
 
 		var trailColor = timeLine.getValues(timeLine.trailColorScript, trackTime);
 		var backdropValues = timeLine.getValues(timeLine.backdropScript, trackTime);
@@ -304,10 +307,10 @@ export default class Scene {
 		if (this.stats) this.stats.update();
 		if (this.helper) this.helper.update();
 
-		this.backdrop.render(t, backdropValues ,this.ground,this.spheres);
-		this.ground.render(this.renderer, t, dummy.position, skyColor, trailColor ,this.spheres);
-		this.particles.render(t, delta, percent , snowValues);
-		this.spheres.render(trackTime,t,this.particles);
+		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
+		this.ground.render(this.renderer, t, dummy.position, backgroundColor, trailColor, this.spheres);
+		this.particles.render(t, delta, percent, snowValues ,this.spheres.sphereSnowValues);
+		this.spheres.render(trackTime, t,backgroundColor);
 
 
 
@@ -326,11 +329,5 @@ export default class Scene {
 		lastTrackTime = trackTime;
 	}
 
-	// setBackgroundColor(r, g, b) {
-	// 	var c = Math.round(r) * 256 * 256 + Math.round(g) * 256 + Math.round(b);
-	// 	this.renderer.setClearColor(c, 1.);
-	// 	plane.material.uniforms.backgroundColor.value.setHex(c);
-	// 	sphereMaterial.uniforms.backgroundColor.value.setHex(c);
-	// }
 
 }

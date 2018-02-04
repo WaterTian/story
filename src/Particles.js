@@ -57,7 +57,7 @@ export default class Particles {
         ptr += 4;
       }
     }
-    
+
     ///mouse be THREE.FloatType
     var curPos = new THREE.DataTexture(cur, width, height, THREE.RGBAFormat, THREE.FloatType);
     var prevPos = new THREE.DataTexture(prev, width, height, THREE.RGBAFormat, THREE.FloatType);
@@ -169,17 +169,22 @@ export default class Particles {
 
   }
 
-  render(t, delta, percent , snowValues) {
+  render(t, delta, percent, snowValues, sphereSnowValues) {
 
     this.snowSimulation.shader.uniforms.persistence.value = snowValues.persistence;
     this.snowSimulation.shader.uniforms.speed.value = snowValues.speed;
-
-    // this.snow.material.uniforms.scale.value = snowValues.scale;
     this.snow.material.uniforms.delta.value = snowValues.delta;
     this.snow.material.uniforms.opacity.value = snowValues.opacity;
 
+    if (sphereSnowValues.speed) {
+      this.snowSimulation.shader.uniforms.persistence.value = sphereSnowValues.persistence;
+      this.snowSimulation.shader.uniforms.speed.value = sphereSnowValues.speed;
+      this.snow.material.uniforms.delta.value = sphereSnowValues.delta;
+      this.snow.material.uniforms.opacity.value = sphereSnowValues.opacity;
+    }
 
-
+    // this.snowSimulation.shader.uniforms.decay.value = params.decay;
+    // this.snowSimulation.shader.uniforms.spread.value = params.spread;
     this.snowSimulation.shader.uniforms.time.value = t;
     this.snowSimulation.shader.uniforms.delta.value = delta / (1 / 60.);
     this.snowSimulation.render();
@@ -188,5 +193,7 @@ export default class Particles {
 
 
     this.snow.geometry.setDrawRange(0, Math.floor(this.snow.geometry.maxInstancedCount * percent));
+    // this.snow.material.uniforms.scale.value = params.scale;
+
   }
 }
