@@ -4,7 +4,7 @@ const ShaderTexture = require('./libs/THREE.ShaderTexture').default;
 
 
 export default class Ground {
-  constructor(renderer,helper) {
+  constructor(renderer) {
 
     this.terrainTexture;
     this.shadowTexture;
@@ -39,9 +39,6 @@ export default class Ground {
 
     this.terrainTexture = new ShaderTexture(renderer, terrainShader, terrainWidth, terrainHeight, THREE.RGBAFormat, THREE.UnsignedByteType);
 
-    // helper.attach(this.terrainTexture.fbo, 'terrain');
-    helper.show(false);
-
     var shadowWidth = 256;
     var shadowHeight = 256;
 
@@ -56,12 +53,12 @@ export default class Ground {
         lightPosition: {
           value: new THREE.Vector3()
         },
-        // sphereData: {
-        //   value: sphereData
-        // },
-        // sphereLight: {
-        //   value: sphereLight
-        // },
+        sphereData: {
+          value: null
+        },
+        sphereLight: {
+          value: null
+        },
         lightColor: {
           value: new THREE.Color(0xffea3b)
         },
@@ -75,8 +72,6 @@ export default class Ground {
     });
 
     this.shadowTexture = new ShaderTexture(renderer, shadowShader, shadowWidth, shadowHeight, THREE.RGBAFormat, THREE.UnsignedByteType);
-
-    helper.attach(this.shadowTexture.fbo, 'terrain shadow');
 
     var blurShadowShader = new THREE.RawShaderMaterial({
       uniforms: {
@@ -95,9 +90,7 @@ export default class Ground {
     });
 
     this.blurHShadowTexture = new ShaderTexture(renderer, blurShadowShader, shadowWidth, shadowHeight, THREE.RGBAFormat, THREE.UnsignedByteType);
-    // helper.attach(this.blurHShadowTexture.fbo, 'blurh sterrain shadow');
     this.blurVShadowTexture = new ShaderTexture(renderer, blurShadowShader, shadowWidth, shadowHeight, THREE.RGBAFormat, THREE.UnsignedByteType);
-    // helper.attach(this.blurVShadowTexture.fbo, 'blurv sterrain shadow');
 
     const footprintTexture = new THREE.TextureLoader().load('./assets/footprint.png');
 
@@ -172,9 +165,9 @@ export default class Ground {
 
   }
 
-  render(renderer,t,lightPosition,backgroundColor,trailColor) {
+  render(renderer, t, lightPosition, backgroundColor, trailColor, spheres) {
 
-    for (var j = 0; j < this.footprints.length; j++ ) {
+    for (var j = 0; j < this.footprints.length; j++) {
       var f = this.footprints[j];
       var s = f.z + t;
       s %= 10;
@@ -197,15 +190,18 @@ export default class Ground {
     var tC = Math.round(trailColor.r) * 256 * 256 + Math.round(trailColor.g) * 256 + Math.round(trailColor.b);
     this.shadowTexture.shader.uniforms.lightColor.value.setHex(tC);
 
+    this.shadowTexture.shader.uniforms.sphereData.value = spheres.sphereData;
+    this.shadowTexture.shader.uniforms.sphereLight.value = spheres.sphereLight;
+
     renderer.autoClear = false;
     this.shadowTexture.render();
     renderer.autoClear = true;
 
 
-    this.blurHShadowTexture.shader.uniforms.delta.value.set(1.,0.);
+    this.blurHShadowTexture.shader.uniforms.delta.value.set(1., 0.);
     this.blurHShadowTexture.shader.uniforms.source.value = this.shadowTexture.fbo.texture;
     this.blurHShadowTexture.render();
-    this.blurVShadowTexture.shader.uniforms.delta.value.set(0.,1.);
+    this.blurVShadowTexture.shader.uniforms.delta.value.set(0., 1.);
     this.blurVShadowTexture.shader.uniforms.source.value = this.blurHShadowTexture.fbo.texture;
     this.blurVShadowTexture.render();
     this.plane.material.uniforms.shadowMap.value = this.blurVShadowTexture.fbo.texture;

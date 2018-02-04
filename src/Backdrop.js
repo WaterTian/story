@@ -29,7 +29,7 @@ export default class Backdrop {
     this.backdrop.userData.name = 'Backdrop';
   }
 
-  render(t, backdropValues) {
+  render(t, backdropValues ,ground ,spheres) {
 
     this.backdrop.rotation.z = backdropValues.rot;
 
@@ -38,6 +38,10 @@ export default class Backdrop {
     this.backdrop.material.uniforms.from.value.setHex(bFrom);
     this.backdrop.material.uniforms.to.value.setHex(bTo);
     this.backdrop.material.uniforms.time.value = .05 * t;
+
+    ground.plane.material.uniforms.backgroundColor.value.setHex(bFrom);
+    spheres.sphereMaterial.uniforms.rimColor.value.setHex(bFrom);
+    spheres.sphereMaterial.uniforms.backgroundColor.value.setHex(bFrom);
 
   }
 }

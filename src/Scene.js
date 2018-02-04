@@ -16,6 +16,7 @@ const TimeLine = require('./TimeLine').default;
 const Ground = require('./Ground').default;
 const Backdrop = require('./Backdrop').default;
 const Particles = require('./Particles').default;
+const Spheres = require('./Spheres').default;
 
 window.floatType = isMobile.any ? THREE.HalfFloatType : THREE.FloatType;
 
@@ -152,13 +153,14 @@ export default class Scene {
 		That.backdrop = new Backdrop();
 		That.scene.add(That.backdrop.backdrop);
 
-		That.ground = new Ground(this.renderer, this.helper);
+		That.ground = new Ground(this.renderer);
 		That.scene.add(That.ground.obj);
 
 		That.particles = new Particles(this.renderer);
 		That.scene.add(That.particles.snow);
 
-
+		That.spheres = new Spheres(globalSpeed);
+		That.scene.add(That.spheres.sphereGroup);
 
 		dummy = new THREE.Mesh(
 			new THREE.IcosahedronBufferGeometry(.5, 3),
@@ -302,9 +304,10 @@ export default class Scene {
 		if (this.stats) this.stats.update();
 		if (this.helper) this.helper.update();
 
-		if (this.backdrop) this.backdrop.render(t, backdropValues);
-		if (this.ground) this.ground.render(this.renderer, t, dummy.position, skyColor, trailColor);
-		if (this.particles) this.particles.render(t, delta, percent , snowValues);
+		this.backdrop.render(t, backdropValues ,this.ground,this.spheres);
+		this.ground.render(this.renderer, t, dummy.position, skyColor, trailColor ,this.spheres);
+		this.particles.render(t, delta, percent , snowValues);
+		this.spheres.render(trackTime,t,this.particles);
 
 
 
