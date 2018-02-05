@@ -44,6 +44,15 @@ export default class TimeLine {
     this.snowScript = snowScript;
 
 
+    var trailScript = new Script();
+    trailScript.addKeyframe({opacity: 0., scale: .01,},0);
+    trailScript.addKeyframe({opacity: 0., scale: .1,},20);
+    trailScript.addKeyframe({opacity: .05, scale: .1,},22);
+    trailScript.addKeyframe({opacity: .05, scale: .05,},38);
+    trailScript.addKeyframe({opacity: .1, scale: .075,},42);
+    trailScript.addKeyframe({opacity: .1, scale: .075,},200);
+    this.trailScript = trailScript;
+    
     var trailColorScript = new Script();
     trailColorScript.addKeyframe({r:0,g:0,b:0},0);
     trailColorScript.addKeyframe({r:0xff,g:0xff,b:0xff},3);
@@ -62,6 +71,21 @@ export default class TimeLine {
     lightScript.addKeyframe({overall: 0},200);
     this.lightScript = lightScript;
 
+
+    var titleScript = new Script();
+    titleScript.addKeyframe({opacity:0, y:0, title:0}, 0);
+    titleScript.addKeyframe({opacity:0, y:-.5, title:0}, 8);
+    titleScript.addKeyframe({opacity:1, y:0, title:0}, 11);
+    titleScript.addKeyframe({opacity:1, y:0, title:0}, 16);
+    titleScript.addKeyframe({opacity:0, y:.5, title:0}, 19);
+    titleScript.addKeyframe({opacity:0, y:-.5, title:1}, 22);
+    titleScript.addKeyframe({opacity:1, y:0, title:1}, 25);
+    titleScript.addKeyframe({opacity:1, y:0, title:1}, 30);
+    titleScript.addKeyframe({opacity:0, y:.5, title:1}, 33);
+    titleScript.addKeyframe({opacity:0, y:-.5, title:2}, 130);
+    titleScript.addKeyframe({opacity:1, y:0, title:2}, 133);
+    titleScript.addKeyframe({opacity:1, y:0, title:2}, 200);
+    this.titleScript = titleScript;
 
     var backdropScript = new Script();
     backdropScript.addKeyframe({fr: 0xa1, fg: 0xb5, fb: 0xd7, tr: 0, rg: 0, tb: 0, rot: -Math.PI/2},0);

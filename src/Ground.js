@@ -186,8 +186,7 @@ export default class Ground {
     this.shadowTexture.shader.uniforms.lightPosition.value.copy(lightPosition);
     this.shadowTexture.shader.uniforms.pos.value = this.terrainTexture.shader.uniforms.time.value;
 
-    var tC = Math.round(trailColor.r) * 256 * 256 + Math.round(trailColor.g) * 256 + Math.round(trailColor.b);
-    this.shadowTexture.shader.uniforms.lightColor.value.setHex(tC);
+    this.shadowTexture.shader.uniforms.lightColor.value.setHex(trailColor);
 
     this.shadowTexture.shader.uniforms.sphereData.value = spheres.sphereData;
     this.shadowTexture.shader.uniforms.sphereLight.value = spheres.sphereLight;

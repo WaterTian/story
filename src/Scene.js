@@ -17,6 +17,7 @@ const Ground = require('./Ground').default;
 const Backdrop = require('./Backdrop').default;
 const Particles = require('./Particles').default;
 const Spheres = require('./Spheres').default;
+const TitleCard = require('./TitleCard').default;
 
 window.floatType = isMobile.any ? THREE.HalfFloatType : THREE.FloatType;
 
@@ -32,8 +33,6 @@ var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2(0, 0);
 var intersectionPlane;
 
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
 
 
 var track = new Audio();
@@ -51,10 +50,10 @@ export default class Scene {
 	}
 
 	init() {
-		// this.vconsole = new VConsole();
+		this.vconsole = new VConsole();
 
 		this.stats = new Stats();
-		// document.body.appendChild(this.stats.dom);
+		document.body.appendChild(this.stats.dom);
 
 
 
@@ -113,8 +112,6 @@ export default class Scene {
 	onWindowResized(event) {
 		var w = window.innerWidth;
 		var h = window.innerHeight;
-		windowHalfX = w / 2;
-		windowHalfY = h / 2;
 
 		That.renderer.setSize(w, h);
 		That.camera.aspect = w / h;
@@ -128,6 +125,7 @@ export default class Scene {
 		finalTexture.setSize(w * dPR, h * dPR);
 
 		That.particles.snow.material.uniforms.resolution.value.set(w, h);
+		That.particles.trail.material.uniforms.resolution.value.set(w, h);
 	}
 
 
@@ -146,12 +144,13 @@ export default class Scene {
 			startDiv.removeEventListener('click', startPlaying);
 			startDiv.style.display = 'none';
 			track.play();
-			// track.volume = 0.01;
-			// track.currentTime = 90;
+			track.volume = 0.01;
+			track.currentTime = 19;
 		}
 		if (!isMobile.any) startPlaying();
 
-
+		That.titleCard = new TitleCard();
+		That.scene.add(That.titleCard.obj);
 
 		That.backdrop = new Backdrop();
 		That.scene.add(That.backdrop.backdrop);
@@ -161,6 +160,7 @@ export default class Scene {
 
 		That.particles = new Particles(this.renderer);
 		That.scene.add(That.particles.snow);
+		That.scene.add(That.particles.trail);
 
 		That.spheres = new Spheres(globalSpeed);
 		That.scene.add(That.spheres.sphereGroup);
@@ -298,19 +298,25 @@ export default class Scene {
 		this.renderer.setClearColor(backgroundColor, 1.);
 
 		var trailColor = timeLine.getValues(timeLine.trailColorScript, trackTime);
+		var _trailColor = Math.round(trailColor.r) * 256 * 256 + Math.round(trailColor.g) * 256 + Math.round(trailColor.b);
+		dummy.material.uniforms.color.value.setHex(_trailColor);
+
 		var backdropValues = timeLine.getValues(timeLine.backdropScript, trackTime);
 		var snowValues = timeLine.getValues(timeLine.snowScript, trackTime);
+		var titleValues = timeLine.getValues(timeLine.titleScript, trackTime);
+		var trailValues = timeLine.getValues(timeLine.trailScript, trackTime);
 
-		dummy.material.uniforms.color.value.setHex(Math.round(trailColor.r) * 256 * 256 + Math.round(trailColor.g) * 256 + Math.round(trailColor.b));
 
 
 		if (this.stats) this.stats.update();
 		if (this.helper) this.helper.update();
 
 		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
-		this.ground.render(this.renderer, t, dummy.position, backgroundColor, trailColor, this.spheres);
-		this.particles.render(t, delta, percent, snowValues ,this.spheres.sphereSnowValues);
-		this.spheres.render(trackTime, t,backgroundColor);
+		this.ground.render(this.renderer, t, dummy.position, backgroundColor, _trailColor, this.spheres);
+		this.particles.render(trackTime,t, delta, percent, snowValues, this.spheres.sphereSnowValues,_trailColor,dummy.position,trailValues);
+		this.spheres.render(trackTime, t, backgroundColor);
+		this.titleCard.render(renderCamera, titleValues);
+		// this.trail.render(trackTime, _trailColor, t, delta, dummy.position,trailValues);
 
 
 
