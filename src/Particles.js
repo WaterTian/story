@@ -21,15 +21,6 @@ export default class Particles {
     var height = 256;
     var NUM_POINTS = width * height;
 
-    var params = {
-      decay: .1,
-      persistence: .1,
-      speed: .05,
-      spread: 10,
-      scale: .03,
-      taper: 0,
-      opacity: .5
-    }
 
 
     var positions = new THREE.WebGLRenderTarget(1, 1, {
@@ -93,10 +84,11 @@ export default class Particles {
 
     var snowTexture = new THREE.TextureLoader().load('./assets/snow.png');
 
+
     var snowMaterial = new THREE.RawShaderMaterial({
       uniforms: {
         scale: {
-          value: params.scale
+          value: .03
         },
         dimensions: {
           value: new THREE.Vector2(width, height)
@@ -162,10 +154,10 @@ export default class Particles {
           value: .5
         },
         spread: {
-          value: params.spread
+          value: 10
         },
         decay: {
-          value: params.decay
+          value: .1
         },
         delta: {
           value: 0
@@ -178,6 +170,7 @@ export default class Particles {
     this.snowSimulation = new PingPongTexture(this.renderer, snowSimulationShader, width, height, THREE.RGBAFormat, floatType);
 
   }
+
 
 
   initTrail() {
@@ -308,7 +301,7 @@ export default class Particles {
           value: .5
         },
         decay: {
-          value: .5
+          value: .1
         },
         delta: {
           value: 0
@@ -340,8 +333,6 @@ export default class Particles {
       this.snow.material.uniforms.delta.value = sphereSnowValues.delta;
       this.snow.material.uniforms.opacity.value = sphereSnowValues.opacity;
     }
-    // this.snowSimulation.shader.uniforms.decay.value = params.decay;
-    // this.snowSimulation.shader.uniforms.spread.value = params.spread;
     this.snowSimulation.shader.uniforms.time.value = t;
     this.snowSimulation.shader.uniforms.delta.value = delta / (1 / 60.);
     this.snowSimulation.render();
@@ -350,7 +341,6 @@ export default class Particles {
 
 
     this.snow.geometry.setDrawRange(0, Math.floor(this.snow.geometry.maxInstancedCount * percent));
-    // this.snow.material.uniforms.scale.value = params.scale;
 
 
     ////////////////////////////////////
@@ -363,16 +353,15 @@ export default class Particles {
     this.trail.material.uniforms.color.value.setHex(trailColor);
 
     this.trailSimulation.shader.uniforms.persistence.value = 1.;
-    this.trailSimulation.shader.uniforms.speed.value = .01;
-    this.trailSimulation.shader.uniforms.decay.value = 1.;
+    this.trailSimulation.shader.uniforms.speed.value = .001;
+    this.trailSimulation.shader.uniforms.decay.value = .1;
     this.trailSimulation.shader.uniforms.spread.value = .1;
     this.trailSimulation.shader.uniforms.time.value = t;
     this.trailSimulation.shader.uniforms.delta.value = delta / ( 1 / 60. );
     this.trailSimulation.shader.uniforms.spawn.value.copy(trailPosition);
 
     this.trailSimulation.shader.uniforms.persistence.value = this.snowSimulation.shader.uniforms.persistence.value;
-    this.trailSimulation.shader.uniforms.speed.value = this.snowSimulation.shader.uniforms.speed.value;
-    // this.trailSimulation.shader.uniforms.decay.value = this.snowSimulation.shader.uniforms.decay.value;
+    // this.trailSimulation.shader.uniforms.speed.value = this.snowSimulation.shader.uniforms.speed.value;
 
     this.trailSimulation.render();
     this.trail.material.uniforms.curPos.value = this.trailSimulation.front.texture;

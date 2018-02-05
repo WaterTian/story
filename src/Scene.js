@@ -2,15 +2,17 @@ const THREE = require('three');
 const glslify = require('glslify');
 const TweenMax = require('gsap');
 const OrbitControls = require('three-orbit-controls')(THREE);
+
 const Stats = require('stats.js');
 const dat = require('dat-gui');
 const VConsole = require('vconsole');
 
 
 const isMobile = require('./libs/isMobile.min.js');
-const FBOHelper = require('./libs/THREE.FBOHelper');
 const Bloom = require('./libs/THREE.Bloom').default;
 const ShaderTexture = require('./libs/THREE.ShaderTexture').default;
+
+const AssetsManger = require('./AssetsManger').default;
 
 const TimeLine = require('./TimeLine').default;
 const Ground = require('./Ground').default;
@@ -35,8 +37,8 @@ var intersectionPlane;
 
 
 
-var track = new Audio();
-var globalSpeed = .45;
+var track;
+var globalSpeed = .6;
 var lastTrackTime = 0;
 var t = 0;
 var lastTime = 0;
@@ -46,12 +48,27 @@ var timeLine = new TimeLine();
 export default class Scene {
 	constructor() {
 		That = this;
-		this.init();
+
+		var assetsManager = new AssetsManger();
+		assetsManager.onComplete = this.loaded;
+		assetsManager.start();
+	}
+
+	loaded(e) {
+		console.log("loadComplete");
+		document.getElementById('loading').style.display = 'none';
+
+		track = e.resources["bg1"].sound;
+		track.play();
+
+		console.log(track);
+
+		That.init();
 	}
 
 	init() {
-		this.vconsole = new VConsole();
 
+		this.vconsole = new VConsole();
 		this.stats = new Stats();
 		document.body.appendChild(this.stats.dom);
 
@@ -88,7 +105,6 @@ export default class Scene {
 		// this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 		// this.controls.update();
 
-		this.helper = new FBOHelper(this.renderer);
 
 		window.addEventListener('resize', this.onWindowResized);
 		window.addEventListener('mousemove', this.onDocumentMouseMove);
@@ -129,25 +145,8 @@ export default class Scene {
 	}
 
 
+
 	initScene() {
-		document.getElementById('loading').style.display = 'none';
-
-		//sound
-		track.src = 'assets/80sxmasexperiments3.mp3';
-		track.controls = false;
-		this.container.appendChild(track);
-		var startDiv = document.getElementById('start');
-		startDiv.style.display = 'block';
-		startDiv.addEventListener('click', startPlaying);
-
-		function startPlaying() {
-			startDiv.removeEventListener('click', startPlaying);
-			startDiv.style.display = 'none';
-			track.play();
-			track.volume = 0.01;
-			track.currentTime = 19;
-		}
-		if (!isMobile.any) startPlaying();
 
 		That.titleCard = new TitleCard();
 		That.scene.add(That.titleCard.obj);
@@ -265,7 +264,8 @@ export default class Scene {
 
 	// main animation loop
 	render() {
-		var trackTime = track.currentTime;
+		var trackTime = track.context.audioContext.currentTime;
+
 		t += globalSpeed * (trackTime - lastTrackTime);
 		var delta = t - lastTime;
 		var percent = trackTime / track.duration;
@@ -309,11 +309,10 @@ export default class Scene {
 
 
 		if (this.stats) this.stats.update();
-		if (this.helper) this.helper.update();
 
 		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
 		this.ground.render(this.renderer, t, dummy.position, backgroundColor, _trailColor, this.spheres);
-		this.particles.render(trackTime,t, delta, percent, snowValues, this.spheres.sphereSnowValues,_trailColor,dummy.position,trailValues);
+		this.particles.render(trackTime, t, delta, percent, snowValues, this.spheres.sphereSnowValues, _trailColor, dummy.position, trailValues);
 		this.spheres.render(trackTime, t, backgroundColor);
 		this.titleCard.render(renderCamera, titleValues);
 		// this.trail.render(trackTime, _trailColor, t, delta, dummy.position,trailValues);

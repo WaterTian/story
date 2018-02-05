@@ -5,9 +5,10 @@ const glslify = require('glslify');
 
 export default class TitleCard {
   constructor() {
-    this.gloomTexture = new THREE.TextureLoader().load('./assets/gloom.png');
-    this.spiteTexture = new THREE.TextureLoader().load('./assets/spite.png');
-    this.exploreTexture = new THREE.TextureLoader().load('./assets/explore.png');
+    this.texture1 = new THREE.TextureLoader().load('./assets/txt1.png');
+    this.texture2 = new THREE.TextureLoader().load('./assets/txt2.png');
+    this.texture3 = new THREE.TextureLoader().load('./assets/txt3.png');
+
 
 
 
@@ -40,9 +41,9 @@ export default class TitleCard {
 
 
   render(renderCamera, titleValues) {
-    if (titleValues.title === 0) this.obj.material.uniforms.map.value = this.gloomTexture;
-    if (titleValues.title === 1) this.obj.material.uniforms.map.value = this.spiteTexture;
-    if (titleValues.title === 2) this.obj.material.uniforms.map.value = this.exploreTexture;
+    if (titleValues.title === 0) this.obj.material.uniforms.map.value = this.texture1;
+    if (titleValues.title === 1) this.obj.material.uniforms.map.value = this.texture2;
+    if (titleValues.title === 2) this.obj.material.uniforms.map.value = this.texture3;
     
     this.obj.material.uniforms.opacity.value = titleValues.opacity;
     this.obj.position.set(0, titleValues.y, -4).applyMatrix4(renderCamera.matrix)
