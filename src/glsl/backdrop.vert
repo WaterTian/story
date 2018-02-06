@@ -14,6 +14,7 @@ varying vec3 vColor;
 
 void main() {
 	vUv = uv;
-	vColor = mix(from,to,vec3(mod(uv.x*2.,1.)));
+	// vColor = mix(from,to,vec3(mod(uv.x*2.,1.)));
+	vColor = from;
 	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
 }

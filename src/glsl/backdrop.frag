@@ -89,5 +89,8 @@ float fbm(vec2 uv) {
 
 void main() {
 	float n = fbm(vUv + time);
-	gl_FragColor = vec4(vColor+.2*(.5-n),1.);
+
+  vec3 c = texture2D(map,vUv).rgb;
+
+	gl_FragColor = vec4(c*vColor+.2*(.5-n),1.);
 }

@@ -5,6 +5,7 @@ uniform sampler2D shadowMap;
 uniform sampler2D heightMap;
 uniform vec3 backgroundColor;
 uniform float time;
+uniform float alpha;
 
 varying vec2 vUv;
 varying float vHeight;
@@ -91,7 +92,8 @@ void main() {
 	gl_FragColor.rgb += grain;
 	float s = length(shadow.rgb);
 	gl_FragColor.rgb += sparkle * s;
-	gl_FragColor.a = 1.-d + sparkle*s;
 	gl_FragColor.rgb = mix( gl_FragColor.rgb, backgroundColor, d);
+  gl_FragColor.a = 1.-d + sparkle*s;
+  gl_FragColor.a *=alpha;
 //	gl_FragColor = vec4(vec3(vDepth),1.);
 }

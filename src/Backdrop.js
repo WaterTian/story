@@ -5,13 +5,19 @@ const ShaderTexture = require('./libs/THREE.ShaderTexture').default;
 
 export default class Backdrop {
   constructor() {
+    
+    const starsmap = new THREE.TextureLoader().load('./assets/starsmap.jpg');
 
     this.backdrop = new THREE.Mesh(
       new THREE.IcosahedronBufferGeometry(50, 3),
       new THREE.RawShaderMaterial({
         uniforms: {
+          map: {
+            value: starsmap
+          },
           from: {
-            value: new THREE.Color(0xa1b5d7)
+            // value: new THREE.Color(0xa1b5d7)
+            value: new THREE.Color(0xfbe3df)
           },
           to: {
             value: new THREE.Color(0x0000000)
@@ -29,9 +35,9 @@ export default class Backdrop {
     this.backdrop.userData.name = 'Backdrop';
   }
 
-  render(t, backdropValues ,ground ,spheres) {
+  render(t, backdropValues, ground, spheres) {
 
-    this.backdrop.rotation.z = backdropValues.rot;
+    // this.backdrop.rotation.z = backdropValues.rot;
 
     var bFrom = Math.round(backdropValues.fr) * 256 * 256 + Math.round(backdropValues.fg) * 256 + Math.round(backdropValues.fb);
     var bTo = Math.round(backdropValues.tr) * 256 * 256 + Math.round(backdropValues.tg) * 256 + Math.round(backdropValues.tb);

@@ -144,11 +144,14 @@ export default class Ground {
         },
         time: {
           value: 0
+        },
+        alpha: {
+          value: 1
         }
       },
       vertexShader: glslify('./glsl/plane.vert'),
       fragmentShader: glslify('./glsl/plane.frag'),
-      wireframe: !true,
+      wireframe: false,
       transparent: true
     });
 
@@ -163,6 +166,17 @@ export default class Ground {
     this.plane.userData.name = 'Landscape';
     this.obj.add(this.plane);
 
+  }
+
+  setAlpha(alpha) {
+
+    this.plane.material.uniforms.alpha.value = alpha;
+
+    if (alpha < 0) {
+      this.plane.material.wireframe = true;
+    } else {
+      this.plane.material.wireframe = false;
+    }
   }
 
   render(renderer, t, lightPosition, backgroundColor, trailColor, spheres) {

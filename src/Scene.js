@@ -10,7 +10,6 @@ const Tone = require('tone');
 
 
 const isMobile = require('./libs/isMobile.min.js');
-const FBOHelper = require('./libs/THREE.FBOHelper');
 const Bloom = require('./libs/THREE.Bloom').default;
 const ShaderTexture = require('./libs/THREE.ShaderTexture').default;
 
@@ -21,6 +20,8 @@ const Particles = require('./Particles').default;
 const Spheres = require('./Spheres').default;
 const TitleCard = require('./TitleCard').default;
 
+const Box = require('./Box').default;
+
 window.floatType = isMobile.any ? THREE.HalfFloatType : THREE.FloatType;
 
 var That;
@@ -30,16 +31,17 @@ var baseFBO;
 var bloom;
 var resolution = new THREE.Vector2(0, 0);
 
-var dummy;
+var boxGeometry;
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2(0, 0);
 var intersectionPlane;
 
+var orientation = new THREE.Vector2(0, 0);
 
 var soundPlayer;
 var soundPanVol;
 
-var startTime=0; //debug for player
+var startTime = 0; //debug for player
 
 var globalSpeed = .45;
 var lastTrackTime = 0;
@@ -52,15 +54,54 @@ var timeLine = new TimeLine();
 export default class Scene {
 	constructor() {
 		That = this;
-		this.init();
+		this.initLoader();
+	}
+
+	initLoader() {
+
+		var loader = new THREE.ObjectLoader();
+		loader.load('./assets/box.json', function(object) {
+			boxGeometry = object.children[0].geometry;
+
+			That.initSound();
+		});
+	}
+
+	initSound() {
+		soundPlayer = new Tone.Player("./assets/bg1.mp3", function() {
+			var startDiv = document.getElementById('start');
+			startDiv.style.display = 'block';
+			startDiv.addEventListener('click', startPlaying);
+
+			function startPlaying() {
+				startDiv.removeEventListener('click', startPlaying);
+				startDiv.style.display = 'none';
+				soundPlayer.start();
+
+				startTime = soundPlayer.now();
+
+				console.log(soundPlayer);
+				console.log(soundPlayer.now());
+				console.log(soundPlayer.buffer.duration);
+
+				That.init();
+				document.getElementById('loading').style.display = 'none';
+			}
+		});
+
+		soundPanVol = new Tone.PanVol(0, -5);
+		soundPlayer.connect(soundPanVol);
+		soundPanVol.toMaster();
+
 	}
 
 
-	init() {
-		this.vconsole = new VConsole();
 
-		this.stats = new Stats();
-		document.body.appendChild(this.stats.dom);
+	init() {
+		// this.vconsole = new VConsole();
+
+		// this.stats = new Stats();
+		// document.body.appendChild(this.stats.dom);
 
 
 
@@ -70,7 +111,7 @@ export default class Scene {
 
 		this.scene = new THREE.Scene();
 
-		this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, .001, 100);
+		this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, .001, 1000);
 		this.camera.target = new THREE.Vector3(0, 0, 0);
 		this.camera.position.set(0, 4, -10);
 		this.camera.lookAt(this.camera.target);
@@ -95,41 +136,19 @@ export default class Scene {
 		// this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 		// this.controls.update();
 
-		this.helper = new FBOHelper(this.renderer);
 
 		window.addEventListener('resize', this.onWindowResized);
 		window.addEventListener('mousemove', this.onDocumentMouseMove);
 		this.renderer.domElement.addEventListener('touchmove', this.onDocumentTouchMove);
+		if (window.DeviceOrientationEvent) {
+			window.addEventListener("deviceorientation", this.onOrientation);
+		}
 
 
-		this.initSound();
 		this.initScene();
 		this.animate();
 		this.onWindowResized();
 
-	}
-
-	initSound() {
-		soundPlayer = new Tone.Player("./assets/bg1.mp3");
-		soundPanVol = new Tone.PanVol(-1, 0);
-		soundPlayer.connect(soundPanVol);
-		soundPanVol.toMaster();
-
-		var startDiv = document.getElementById('start');
-		startDiv.style.display = 'block';
-		startDiv.addEventListener('click', startPlaying);
-
-		function startPlaying() {
-			startDiv.removeEventListener('click', startPlaying);
-			startDiv.style.display = 'none';
-			soundPlayer.start();
-
-			startTime = soundPlayer.now();
-
-			console.log(soundPlayer);
-			console.log(soundPlayer.now());
-			console.log(soundPlayer.buffer.duration);
-		}
 	}
 
 
@@ -162,11 +181,20 @@ export default class Scene {
 		That.particles.snow.material.uniforms.resolution.value.set(w, h);
 		That.particles.trail.material.uniforms.resolution.value.set(w, h);
 	}
+	onOrientation(event) {
+		var _z = event.alpha; //表示设备沿z轴上的旋转角度，范围为0~360。(z轴垂直于平面)
+		var _x = event.beta; //表示设备在x轴上的旋转角度，范围为-180~180。它描述的是设备由前向后旋转的情况。
+		var _y = event.gamma; //表示设备在y轴上的旋转角度，范围为-90~90。它描述的是设备由左向右旋转的情况。
 
+		var _ox = (_y / 90);
+		var _oy = (_x / 180);
+
+		orientation.x = _ox;
+		orientation.y = _oy;
+	}
 
 
 	initScene() {
-		document.getElementById('loading').style.display = 'none';
 
 		That.titleCard = new TitleCard();
 		That.scene.add(That.titleCard.obj);
@@ -184,23 +212,8 @@ export default class Scene {
 		That.spheres = new Spheres(globalSpeed);
 		That.scene.add(That.spheres.sphereGroup);
 
-		dummy = new THREE.Mesh(
-			new THREE.IcosahedronBufferGeometry(.5, 3),
-			new THREE.RawShaderMaterial({
-				uniforms: {
-					color: {
-						value: new THREE.Color(0xffea3b)
-					}
-				},
-				vertexShader: glslify('./glsl/light.vert'),
-				fragmentShader: glslify('./glsl/light.frag'),
-			})
-		);
-		dummy.position.y = 1.1;
-		dummy.scale.set(.1, .1, .1);
-		dummy.renderOrder = 6;
-		dummy.userData.name = 'Dummy';
-		That.scene.add(dummy);
+		That.box = new Box(boxGeometry);
+		That.scene.add(That.box.obj);
 
 
 		baseFBO = new THREE.WebGLRenderTarget(1, 1, {
@@ -284,7 +297,7 @@ export default class Scene {
 
 	// main animation loop
 	render() {
-		var trackTime = soundPlayer.now() - startTime;
+		var trackTime = soundPlayer.now() - startTime + 0;
 		t += globalSpeed * (trackTime - lastTrackTime);
 		var delta = t - lastTime;
 		var percent = trackTime / soundPlayer.buffer.duration;
@@ -294,22 +307,28 @@ export default class Scene {
 
 		if (!this.controls) {
 			var cameraValues = timeLine.getValues(timeLine.cameraScript, trackTime);
+
+			cameraValues.tx += -mouse.x;
+			cameraValues.ty += mouse.y;
+
+			var targetPosition = new THREE.Vector3(cameraValues.x + cameraValues.tx, cameraValues.y + cameraValues.ty, cameraValues.z + cameraValues.tz);
+			renderCamera.target.lerp(targetPosition, .1);
+
 			renderCamera.position.set(cameraValues.x, cameraValues.y, cameraValues.z);
-			renderCamera.target.set(cameraValues.x + cameraValues.tx, cameraValues.y + cameraValues.ty, cameraValues.z + cameraValues.tz);
 			renderCamera.lookAt(renderCamera.target);
 			renderCamera.updateMatrix();
 			renderCamera.updateMatrixWorld();
 		}
 
 
+		soundPanVol.pan.value = mouse.x;
+
+
 		raycaster.setFromCamera(mouse, renderCamera);
 		intersectionPlane.lookAt(renderCamera.position);
 		var intersects = raycaster.intersectObject(intersectionPlane);
+		if (intersects.length) var boxPostion = intersects[0].point;
 
-		if (intersects.length && trackTime > 10) {
-			dummy.position.copy(intersects[0].point);
-			dummy.position.y = Math.max(dummy.position.y, 1);
-		}
 
 
 		var skyColor = timeLine.getValues(timeLine.skyColorScript, trackTime);
@@ -318,7 +337,6 @@ export default class Scene {
 
 		var trailColor = timeLine.getValues(timeLine.trailColorScript, trackTime);
 		var _trailColor = Math.round(trailColor.r) * 256 * 256 + Math.round(trailColor.g) * 256 + Math.round(trailColor.b);
-		dummy.material.uniforms.color.value.setHex(_trailColor);
 
 		var backdropValues = timeLine.getValues(timeLine.backdropScript, trackTime);
 		var snowValues = timeLine.getValues(timeLine.snowScript, trackTime);
@@ -328,14 +346,13 @@ export default class Scene {
 
 
 		if (this.stats) this.stats.update();
-		if (this.helper) this.helper.update();
 
+		this.box.render(trackTime, boxPostion, _trailColor, this.ground);
 		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
-		this.ground.render(this.renderer, t, dummy.position, backgroundColor, _trailColor, this.spheres);
-		this.particles.render(trackTime, t, delta, percent, snowValues, this.spheres.sphereSnowValues, _trailColor, dummy.position, trailValues);
+		this.ground.render(this.renderer, t, That.box.obj.position, backgroundColor, _trailColor, this.spheres);
+		this.particles.render(trackTime, t, delta, percent, snowValues, this.spheres.sphereSnowValues, _trailColor, That.box.obj.position, trailValues);
 		this.spheres.render(trackTime, t, backgroundColor);
 		this.titleCard.render(renderCamera, titleValues);
-		// this.trail.render(trackTime, _trailColor, t, delta, dummy.position,trailValues);
 
 
 

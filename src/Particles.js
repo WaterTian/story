@@ -196,7 +196,7 @@ export default class Particles {
     var prev = new Float32Array(width * height * 4);
 
     var ptr = 0;
-    var radius = 1;
+    var radius = 3;
     var tmp = new THREE.Vector3();
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
@@ -353,7 +353,7 @@ export default class Particles {
     this.trail.material.uniforms.color.value.setHex(trailColor);
 
     this.trailSimulation.shader.uniforms.persistence.value = 1.;
-    this.trailSimulation.shader.uniforms.speed.value = .001;
+    this.trailSimulation.shader.uniforms.speed.value = .006;
     this.trailSimulation.shader.uniforms.decay.value = .1;
     this.trailSimulation.shader.uniforms.spread.value = .1;
     this.trailSimulation.shader.uniforms.time.value = t;
@@ -368,7 +368,7 @@ export default class Particles {
     this.trail.material.uniforms.prevPos.value = this.trailSimulation.back.texture;
 
     this.trail.material.uniforms.opacity.value = trailValues.opacity;
-    this.trail.material.uniforms.scale.value = trailValues.scale;
+    this.trail.material.uniforms.scale.value = trailValues.scale*2;
 
 
   }
