@@ -6,6 +6,8 @@ const Stats = require('stats.js');
 const dat = require('dat-gui');
 const VConsole = require('vconsole');
 
+const Tone = require('tone');
+
 
 const isMobile = require('./libs/isMobile.min.js');
 const FBOHelper = require('./libs/THREE.FBOHelper');
@@ -34,12 +36,16 @@ var mouse = new THREE.Vector2(0, 0);
 var intersectionPlane;
 
 
+var soundPlayer;
+var soundPanVol;
 
-var track = new Audio();
+var startTime=0; //debug for player
+
 var globalSpeed = .45;
 var lastTrackTime = 0;
 var t = 0;
 var lastTime = 0;
+
 
 var timeLine = new TimeLine();
 
@@ -48,6 +54,7 @@ export default class Scene {
 		That = this;
 		this.init();
 	}
+
 
 	init() {
 		this.vconsole = new VConsole();
@@ -94,10 +101,38 @@ export default class Scene {
 		window.addEventListener('mousemove', this.onDocumentMouseMove);
 		this.renderer.domElement.addEventListener('touchmove', this.onDocumentTouchMove);
 
+
+		this.initSound();
 		this.initScene();
 		this.animate();
 		this.onWindowResized();
+
 	}
+
+	initSound() {
+		soundPlayer = new Tone.Player("./assets/bg1.mp3");
+		soundPanVol = new Tone.PanVol(-1, 0);
+		soundPlayer.connect(soundPanVol);
+		soundPanVol.toMaster();
+
+		var startDiv = document.getElementById('start');
+		startDiv.style.display = 'block';
+		startDiv.addEventListener('click', startPlaying);
+
+		function startPlaying() {
+			startDiv.removeEventListener('click', startPlaying);
+			startDiv.style.display = 'none';
+			soundPlayer.start();
+
+			startTime = soundPlayer.now();
+
+			console.log(soundPlayer);
+			console.log(soundPlayer.now());
+			console.log(soundPlayer.buffer.duration);
+		}
+	}
+
+
 
 	onDocumentMouseMove(event) {
 		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -129,25 +164,9 @@ export default class Scene {
 	}
 
 
+
 	initScene() {
 		document.getElementById('loading').style.display = 'none';
-
-		//sound
-		track.src = 'assets/80sxmasexperiments3.mp3';
-		track.controls = false;
-		this.container.appendChild(track);
-		var startDiv = document.getElementById('start');
-		startDiv.style.display = 'block';
-		startDiv.addEventListener('click', startPlaying);
-
-		function startPlaying() {
-			startDiv.removeEventListener('click', startPlaying);
-			startDiv.style.display = 'none';
-			track.play();
-			track.volume = 0.01;
-			track.currentTime = 19;
-		}
-		if (!isMobile.any) startPlaying();
 
 		That.titleCard = new TitleCard();
 		That.scene.add(That.titleCard.obj);
@@ -265,10 +284,10 @@ export default class Scene {
 
 	// main animation loop
 	render() {
-		var trackTime = track.currentTime;
+		var trackTime = soundPlayer.now() - startTime;
 		t += globalSpeed * (trackTime - lastTrackTime);
 		var delta = t - lastTime;
-		var percent = trackTime / track.duration;
+		var percent = trackTime / soundPlayer.buffer.duration;
 
 
 		var renderCamera = this.camera;
@@ -313,7 +332,7 @@ export default class Scene {
 
 		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
 		this.ground.render(this.renderer, t, dummy.position, backgroundColor, _trailColor, this.spheres);
-		this.particles.render(trackTime,t, delta, percent, snowValues, this.spheres.sphereSnowValues,_trailColor,dummy.position,trailValues);
+		this.particles.render(trackTime, t, delta, percent, snowValues, this.spheres.sphereSnowValues, _trailColor, dummy.position, trailValues);
 		this.spheres.render(trackTime, t, backgroundColor);
 		this.titleCard.render(renderCamera, titleValues);
 		// this.trail.render(trackTime, _trailColor, t, delta, dummy.position,trailValues);
