@@ -26,6 +26,8 @@ window.floatType = isMobile.any ? THREE.HalfFloatType : THREE.FloatType;
 
 var That;
 
+var container = document.getElementById('webglContainer');
+
 var fxaaTexture, finalTexture;
 var baseFBO;
 var bloom;
@@ -93,9 +95,10 @@ export default class Scene {
 		this.stats = new Stats();
 		document.body.appendChild(this.stats.dom);
 
+		container = document.getElementById('webglContainer');
+
 		this.camera;
 		this.scene;
-
 
 		this.scene = new THREE.Scene();
 
@@ -103,7 +106,7 @@ export default class Scene {
 		this.camera.target = new THREE.Vector3(0, 0, 0);
 		this.camera.position.set(0, 4, -10);
 		this.camera.lookAt(this.camera.target);
-		this.scene.add(this.camera);
+		// this.scene.add(this.camera);
 
 		this.renderer = new THREE.WebGLRenderer({
 			antialias: true,
@@ -111,13 +114,13 @@ export default class Scene {
 		});
 		this.renderer.setClearColor(0x0);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		// this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.sortObjects = true;
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
-		this.container = document.getElementById('webglContainer');
-		this.container.appendChild(this.renderer.domElement);
+		
+		container.appendChild(this.renderer.domElement);
 
 
 		// // controls
@@ -151,11 +154,12 @@ export default class Scene {
 		mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(event.touches[0].clientY / window.innerHeight) * 2 + 1;
 	}
-	onWindowResized(event) {
-		var w = window.innerWidth;
-		var h = window.innerHeight;
-
+	onWindowResized() {
+		var w = container.clientWidth;
+		var h = container.clientHeight;
+		
 		That.renderer.setSize(w, h);
+
 		That.camera.aspect = w / h;
 		That.camera.updateProjectionMatrix();
 
