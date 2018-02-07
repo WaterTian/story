@@ -53,9 +53,10 @@ export default class Spheres {
       new THREE.Color(0xdda1ff)
     ];
 
-
+    var g = new THREE.BoxBufferGeometry(.6, .8, 1);
+    // var g = new THREE.IcosahedronBufferGeometry(1, 3);
+    
     var geometry = new THREE.InstancedBufferGeometry();
-    var g = new THREE.IcosahedronBufferGeometry(1, 3);
     geometry.index = g.index;
     geometry.attributes.position = g.attributes.position;
     geometry.attributes.normal = g.attributes.normal;
@@ -90,8 +91,8 @@ export default class Spheres {
 
     for (var i = 0; i < 6; i++) {
       for (var j = 0; j < 3; j++) {
-        //for( var k = 0; k < 3; k++ ) {
-        var r = Maf.randomInRange(1, 4);
+        for( var k = 0; k < 3; k++ ) {
+        var r = Maf.randomInRange(1, 3);
         if (Math.random() > .5) r *= -1;
         var p = new THREE.Vector3(
           r,
@@ -125,7 +126,7 @@ export default class Spheres {
         this.sphereLight.push(c.g);
         this.sphereLight.push(c.b);
         this.sphereLight.push(0);
-        //}
+        }
       }
     }
 

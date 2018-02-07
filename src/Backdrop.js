@@ -37,7 +37,7 @@ export default class Backdrop {
 
   render(t, backdropValues, ground, spheres) {
 
-    // this.backdrop.rotation.z = backdropValues.rot;
+    this.backdrop.rotation.z = backdropValues.rot;
 
     var bFrom = Math.round(backdropValues.fr) * 256 * 256 + Math.round(backdropValues.fg) * 256 + Math.round(backdropValues.fb);
     var bTo = Math.round(backdropValues.tr) * 256 * 256 + Math.round(backdropValues.tg) * 256 + Math.round(backdropValues.tb);

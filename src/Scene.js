@@ -31,7 +31,6 @@ var baseFBO;
 var bloom;
 var resolution = new THREE.Vector2(0, 0);
 
-var boxGeometry;
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2(0, 0);
 var intersectionPlane;
@@ -54,56 +53,45 @@ var timeLine = new TimeLine();
 export default class Scene {
 	constructor() {
 		That = this;
-		this.initLoader();
+		this.loadSound();
 	}
 
-	initLoader() {
 
-		var loader = new THREE.ObjectLoader();
-		loader.load('./assets/box.json', function(object) {
-			boxGeometry = object.children[0].geometry;
-
-			That.initSound();
-		});
-	}
-
-	initSound() {
-		soundPlayer = new Tone.Player("./assets/bg1.mp3", function() {
-			var startDiv = document.getElementById('start');
-			startDiv.style.display = 'block';
-			startDiv.addEventListener('click', startPlaying);
-
-			function startPlaying() {
-				startDiv.removeEventListener('click', startPlaying);
-				startDiv.style.display = 'none';
-				soundPlayer.start();
-
-				startTime = soundPlayer.now();
-
-				console.log(soundPlayer);
-				console.log(soundPlayer.now());
-				console.log(soundPlayer.buffer.duration);
-
-				That.init();
-				document.getElementById('loading').style.display = 'none';
-			}
-		});
+	loadSound() {
+		soundPlayer = new Tone.Player("./assets/bg2.mp3", this.initStart);
 
 		soundPanVol = new Tone.PanVol(0, -5);
 		soundPlayer.connect(soundPanVol);
 		soundPanVol.toMaster();
-
 	}
 
+	initStart() {
+		var startDiv = document.getElementById('start');
+		startDiv.style.display = 'block';
+		startDiv.addEventListener('click', startPlaying);
 
+		function startPlaying() {
+			startDiv.removeEventListener('click', startPlaying);
+			startDiv.style.display = 'none';
+
+
+			soundPlayer.start();
+			startTime = soundPlayer.now();
+
+			console.log(soundPlayer);
+			console.log(soundPlayer.now());
+			console.log(soundPlayer.buffer.duration);
+
+			That.init();
+			document.getElementById('loading').style.display = 'none';
+		}
+	}
 
 	init() {
-		// this.vconsole = new VConsole();
+		this.vconsole = new VConsole();
 
-		// this.stats = new Stats();
-		// document.body.appendChild(this.stats.dom);
-
-
+		this.stats = new Stats();
+		document.body.appendChild(this.stats.dom);
 
 		this.camera;
 		this.scene;
@@ -212,8 +200,9 @@ export default class Scene {
 		That.spheres = new Spheres(globalSpeed);
 		That.scene.add(That.spheres.sphereGroup);
 
-		That.box = new Box(boxGeometry);
+		That.box = new Box(this.renderer,this.scene);
 		That.scene.add(That.box.obj);
+		That.scene.add(That.box.trail);
 
 
 		baseFBO = new THREE.WebGLRenderTarget(1, 1, {
@@ -302,6 +291,8 @@ export default class Scene {
 		var delta = t - lastTime;
 		var percent = trackTime / soundPlayer.buffer.duration;
 
+		if (trackTime > soundPlayer.buffer.duration) trackTime = soundPlayer.buffer.duration;
+
 
 		var renderCamera = this.camera;
 
@@ -347,10 +338,13 @@ export default class Scene {
 
 		if (this.stats) this.stats.update();
 
-		this.box.render(trackTime, boxPostion, _trailColor, this.ground);
+		this.box.render(trackTime, boxPostion, this.ground);
+		this.box.renderTrail(t, delta);
+
+
 		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
-		this.ground.render(this.renderer, t, That.box.obj.position, backgroundColor, _trailColor, this.spheres);
-		this.particles.render(trackTime, t, delta, percent, snowValues, this.spheres.sphereSnowValues, _trailColor, That.box.obj.position, trailValues);
+		this.ground.render(this.renderer, t, That.box.position, backgroundColor, _trailColor, this.spheres);
+		this.particles.render(trackTime, t, delta, percent, snowValues, this.spheres.sphereSnowValues, _trailColor, That.box.position, trailValues);
 		this.spheres.render(trackTime, t, backgroundColor);
 		this.titleCard.render(renderCamera, titleValues);
 
