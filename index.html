@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Stroy</title>
+        <title>新春快乐</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
         <meta name="apple-mobile-web-app-capable" content="yes">
@@ -61,6 +61,19 @@
                 width: 100%;
                 height: 100%;
             }
+
+
+            #end{
+                display: none;
+                opacity:0;
+                position: absolute;
+                z-index: 6;
+                width:100%;
+                height:100%;
+                background-image: url('assets/end.jpg');
+                background-size:cover;
+                background-position: center center;
+            }
         </style>
     </head>
     <body>
@@ -81,7 +94,7 @@
         <div id="loading" ><p>Loading..</p></div>
         <div id="start" ><p>Click to Start</p></div>
 
-
+        <div id="end" ></div>
 
         <script src="dist/app.js?v=0.0.1"></script>
     </body>

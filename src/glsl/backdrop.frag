@@ -1,6 +1,7 @@
 precision highp float;
 
 uniform sampler2D map;
+uniform float mapAlpha;
 uniform float opacity;
 uniform float time;
 
@@ -90,7 +91,7 @@ float fbm(vec2 uv) {
 void main() {
 	float n = fbm(vUv + time);
 
-  vec3 c = texture2D(map,vUv).rgb;
+  vec3 c = texture2D(map,vUv).rgb+vec3(1.)*(1.-mapAlpha);
 
-	gl_FragColor = vec4(vColor+.2*(.5-n),1.);
+	gl_FragColor = vec4(c*vColor+.2*(.5-n),1.);
 }

@@ -41,6 +41,7 @@ var intersectionPlane;
 var orientation = new THREE.Vector2(0, 0);
 
 var soundPlayer;
+var toneMeter;
 var soundPanVol;
 
 var startTime = 0; //debug for player
@@ -51,12 +52,16 @@ var t = 0;
 var lastTime = 0;
 
 
+
+var endDiv;
+
 var timeLine = new TimeLine();
 
 export default class Scene {
 	constructor() {
 		That = this;
 		this.loadSound();
+		endDiv = document.getElementById('end');
 
 		// this.vconsole = new VConsole();
 		// this.stats = new Stats();
@@ -65,11 +70,16 @@ export default class Scene {
 
 
 	loadSound() {
+
 		soundPlayer = new Tone.Player("./assets/bg2.mp3", this.initStart);
 
 		soundPanVol = new Tone.PanVol(0, -5);
 		soundPlayer.connect(soundPanVol);
 		soundPanVol.toMaster();
+
+		toneMeter = new Tone.Meter();
+		soundPlayer.connect(toneMeter);
+		toneMeter.toMaster();
 	}
 
 	initStart() {
@@ -291,7 +301,6 @@ export default class Scene {
 		this.render();
 	}
 
-
 	// main animation loop
 	render() {
 		var trackTime = soundPlayer.now() - startTime + 0;
@@ -299,9 +308,18 @@ export default class Scene {
 		var delta = t - lastTime;
 		var percent = trackTime / soundPlayer.buffer.duration;
 
+
+		if (trackTime > 130) return;
 		// console.log(trackTime);
 
-		// if (trackTime > soundPlayer.buffer.duration) trackTime = soundPlayer.buffer.duration;
+
+
+		if (trackTime > 123) {
+			endDiv.style.display = 'block';
+			var a = (trackTime-123);
+			if(a>1)a=1;
+			endDiv.style.opacity = a;
+		}
 
 
 		var renderCamera = this.camera;
@@ -309,7 +327,7 @@ export default class Scene {
 		if (!this.controls) {
 			var cameraValues = timeLine.getValues(timeLine.cameraScript, trackTime);
 
-			if (trackTime > 20) {
+			if (trackTime > 18) {
 				cameraValues.tx += -mouse.x;
 				cameraValues.ty += mouse.y;
 			}
@@ -347,6 +365,13 @@ export default class Scene {
 		var trailValues = timeLine.getValues(timeLine.trailScript, trackTime);
 
 
+		var soundLevel = toneMeter.getLevel();
+		soundLevel = Tone.dbToGain(soundLevel);
+		if (soundLevel > 1) {
+			this.city.flash(soundLevel);
+		}
+
+
 
 		if (this.stats) this.stats.update();
 
@@ -354,7 +379,7 @@ export default class Scene {
 		if (trackTime > 62) this.box.renderTrail(t, delta);
 
 		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
-		this.ground.render(trackTime,this.renderer, t, That.box.position, backgroundColor, _trailColor, this.spheres);
+		this.ground.render(trackTime, this.renderer, t, That.box.position, backgroundColor, _trailColor, this.spheres);
 		this.particles.render(trackTime, t, delta, percent, snowValues, this.spheres.sphereSnowValues, _trailColor, That.box.position, trailValues);
 		this.spheres.render(trackTime, t, backgroundColor);
 		this.city.render(trackTime, t, backgroundColor);

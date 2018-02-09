@@ -4,32 +4,6 @@ const ShaderTexture = require('./libs/THREE.ShaderTexture').default;
 
 const Maf = require('./libs/Maf.js');
 
-var cityBeats = [
-  [74.5, 76.8, 79.1],
-  [75, 77.3, 79.6],
-  [75.5, 77.8, 80.1],
-
-  [83.7, 86, 88.3],
-  [84.2, 86.5, 88.8],
-  [84.7, 87, 89.3],
-
-  [92.8, 95.1, 97.4],
-  [93.3, 95.6, 97.9],
-  [93.8, 96.1, 98.4],
-
-  [102, 104.3, 106.6],
-  [102.5, 104.8, 107.1],
-  [103, 105.3, 107.6],
-
-  [111.2, 113.5, 115.8],
-  [111.7, 114, 116.3],
-  [112.2, 114.5, 116.8],
-
-  [111.2, 113.5, 115.8, 120.3, 122.6, 124.9],
-  [111.7, 114, 116.3, 120.8, 123.1, 125.4],
-  [112.2, 114.5, 116.8, 121.3, 123.6, 125.9],
-
-];
 
 
 export default class City {
@@ -49,7 +23,7 @@ export default class City {
       new THREE.Color(0xfdd329)
     ];
 
-    var g = new THREE.BoxBufferGeometry(1, 3, 1);
+    var g = new THREE.BoxBufferGeometry(.8, 4, 1);
     
     var geometry = new THREE.InstancedBufferGeometry();
     geometry.index = g.index;
@@ -78,7 +52,7 @@ export default class City {
       transparent: true
     })
 
-    var start = 60 + 14.5 + 2;
+    var start = 68;
     var patternLength = 9.25;
     var sequenceLength = 2;
 
@@ -86,10 +60,10 @@ export default class City {
     var colors = [];
     var sizes = [];
 
-    for (var i = 0; i < 6; i++) {
-      for (var j = 0; j < 3; j++) {
-        for( var k = 0; k < 3; k++ ) {
-        var r = Maf.randomInRange(1, 4);
+    for (var i = 0; i < 4; i++) {
+      for (var j = 0; j < 5; j++) {
+        for( var k = 0; k < 5; k++ ) {
+        var r = Maf.randomInRange(1, 5);
         if (Math.random() > .5) r *= -1;
         var p = new THREE.Vector3(
           r,
@@ -134,34 +108,25 @@ export default class City {
   }
 
 
-  processcityBeats(t) {
-    var adjustedT = t + .1;
-    var beats = [];
-    for (var j = 0; j < cityBeats.length; j++) {
-      var l = cityBeats[j];
-      for (var k = 0; k < l.length; k++) {
-        var tt = l[k];
-        if (adjustedT >= tt && adjustedT <= tt + .3) {
-          beats.push({
-            id: j,
-            l: (adjustedT - tt) / .3
-          })
-        }
-      }
-    }
-    return beats;
-  }
-
 
   setAlpha(alpha) {
 
     this.cityMaterial.uniforms.alpha.value = alpha;
 
+  }  
+
+  flash(level) {
+
+    this.cityGroup.geometry.attributes.color.array[Math.floor(Math.random() * this.cityLight.length)] = level;
+    this.cityGroup.geometry.attributes.color.array[Math.floor(Math.random() * this.cityLight.length)] = level;
+    this.cityGroup.geometry.attributes.color.array[Math.floor(Math.random() * this.cityLight.length)] = level;
+    this.cityGroup.geometry.attributes.color.needsUpdate = true;
+
   }
 
 
   render(trackTime, t, backgroundColor) {
-    var tt = Math.max(0, trackTime - 94);
+    var tt = Math.max(0, trackTime - 74);
     var v = tt / 30;
     this.cityGroup.material.uniforms.emissive.value = v;
 
@@ -169,21 +134,21 @@ export default class City {
       this.cityLight[j + 3] = this.cityGroup.material.uniforms.emissive.value / 5.;
       this.cityGroup.geometry.attributes.color.array[j + 3] = this.cityGroup.material.uniforms.emissive.value / 5.;
     }
-    var b = this.processcityBeats(trackTime);
-    for (var j = 0; j < b.length; j++) {
-      var ptr = b[j].id * 4 + 3;
-      var v = Maf.parabola(b[j].l, 3);
-      this.cityLight[ptr] = v;
-      this.cityGroup.geometry.attributes.color.array[ptr] = 1;
+    // var b = this.processcityBeats(trackTime);
+    // for (var j = 0; j < b.length; j++) {
+    //   var ptr = b[j].id * 4 + 3;
+    //   var v = Maf.parabola(b[j].l, 3);
+    //   this.cityLight[ptr] = v;
+    //   this.cityGroup.geometry.attributes.color.array[ptr] = 1;
 
-      // ///
-      // this.citySnowValues.persistence = 1 + v * .5;
-      // this.citySnowValues.speed = .002 + .004 * v;
-      // this.citySnowValues.delta = 1 + 1 * v;
-      // this.citySnowValues.opacity = .8;
-      // ////
-    }
-    this.cityGroup.geometry.attributes.color.needsUpdate = true;
+    //   // ///
+    //   // this.citySnowValues.persistence = 1 + v * .5;
+    //   // this.citySnowValues.speed = .002 + .004 * v;
+    //   // this.citySnowValues.delta = 1 + 1 * v;
+    //   // this.citySnowValues.opacity = .8;
+    //   // ////
+    // }
+
 
     for (var j = 0; j < this.cityData.length; j++) {
       var ptr = j;

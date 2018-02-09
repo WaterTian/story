@@ -60,8 +60,8 @@ export default class Box {
 
 
   initTrail() {
-    var width = 32;
-    var height = 32;
+    var width = 64;
+    var height = 64;
 
     var NUM_POINTS = width * height;
 
@@ -107,11 +107,11 @@ export default class Box {
     var prev = new Float32Array(width * height * 4);
 
     var ptr = 0;
-    var radius = 2;
+    var radius = .4;
     var tmp = new THREE.Vector3();
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
-        var r = Maf.randomInRange(.5 * radius, radius);
+        var r = Maf.randomInRange(.2 * radius, radius);
         tmp.set(Maf.randomInRange(-r, r), Maf.randomInRange(-r, r), Maf.randomInRange(-r, r));
         tmp.normalize().multiplyScalar(r);
         cur[ptr + 0] = tmp.x;
@@ -267,9 +267,9 @@ export default class Box {
   renderTrail(t, delta) {
 
     this.trailSimulation.shader.uniforms.persistence.value = 1.;
-    this.trailSimulation.shader.uniforms.speed.value = .006;
-    this.trailSimulation.shader.uniforms.decay.value = .6;
-    this.trailSimulation.shader.uniforms.spread.value = .1;
+    this.trailSimulation.shader.uniforms.speed.value = .004;
+    this.trailSimulation.shader.uniforms.decay.value = .2;
+    this.trailSimulation.shader.uniforms.spread.value = .6;
     this.trailSimulation.shader.uniforms.time.value = t;
     this.trailSimulation.shader.uniforms.delta.value = delta / (1 / 60.);
     this.trailSimulation.shader.uniforms.spawn.value.lerp(this.position,0.3);
@@ -308,7 +308,7 @@ export default class Box {
 
   render(trackTime, toPosition) {
 
-    if (toPosition && trackTime > 20) {
+    if (toPosition && trackTime > 18) {
 
       this.position.lerp(toPosition,0.1);
       this.obj.lookAt(toPosition);

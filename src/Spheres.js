@@ -5,29 +5,42 @@ const ShaderTexture = require('./libs/THREE.ShaderTexture').default;
 const Maf = require('./libs/Maf.js');
 
 var sphereBeats = [
-  [74.5, 76.8, 79.1],
-  [75, 77.3, 79.6],
-  [75.5, 77.8, 80.1],
 
-  [83.7, 86, 88.3],
-  [84.2, 86.5, 88.8],
-  [84.7, 87, 89.3],
+  [32.2, 31.5, 33.8, 38.3, 40.6, 42.9],
+  [32.7, 32, 34.3, 38.8, 41.1, 42.4],
+  [33.2, 32.5, 30.8, 31.3, 33.6, 35.9],
 
-  [92.8, 95.1, 97.4],
-  [93.3, 95.6, 97.9],
-  [93.8, 96.1, 98.4],
+  [32.8, 35.1, 37.4],
+  [33.3, 35.6, 37.9],
+  [33.8, 36.1, 38.4],
 
-  [102, 104.3, 106.6],
-  [102.5, 104.8, 107.1],
-  [103, 105.3, 107.6],
+  [34.5, 36.8, 39.1],
+  [35, 37.3, 39.6],
+  [35.5, 37.8, 40.1],
 
-  [111.2, 113.5, 115.8],
-  [111.7, 114, 116.3],
-  [112.2, 114.5, 116.8],
+  [40, 42.3, 44.6],
+  [40.5, 42.8, 45.1],
+  [41, 43.3, 45.6],
 
-  [111.2, 113.5, 115.8, 120.3, 122.6, 124.9],
-  [111.7, 114, 116.3, 120.8, 123.1, 125.4],
-  [112.2, 114.5, 116.8, 121.3, 123.6, 125.9],
+  [43.7, 46, 48.3],
+  [44.2, 46.5, 48.8],
+  [44.7, 47, 49.3],
+
+  [46.2, 48.5, 40.8, 45.3, 47.6, 49.9],
+  [46.7, 50, 52.3, 55.8, 58.1, 60.4],
+  [47.2, 50.5, 52.8, 55.3, 58.6, 60.9],
+
+  [52, 54.3, 56.6],
+  [52.5, 54.8, 57.1],
+  [53, 55.3, 57.6],
+
+  [61.2, 63.5, 65.8, 70.3, 72.6, 74.9],
+  [61.7, 64, 66.3, 70.8, 73.1, 75.4],
+  [62.2, 64.5, 66.8, 71.3, 73.6, 75.9],
+
+  [63.7, 66, 68.3],
+  [64.2, 66.5, 68.8],
+  [64.7, 67, 69.3],
 
 ];
 
@@ -80,7 +93,7 @@ export default class Spheres {
       transparent: true
     })
 
-    var start = 30 + 14.5 + 2;
+    var start = 42;
     var patternLength = 9.25;
     var sequenceLength = 2;
 
@@ -155,7 +168,7 @@ export default class Spheres {
     for (var j = 0; j < sphereBeats.length; j++) {
       var l = sphereBeats[j];
       for (var k = 0; k < l.length; k++) {
-        var tt = l[k]-34;
+        var tt = l[k];
         if (adjustedT >= tt && adjustedT <= tt + .3) {
           beats.push({
             id: j,
@@ -194,7 +207,7 @@ export default class Spheres {
 
     for (var j = 0; j < this.sphereData.length; j++) {
       var ptr = j;
-      this.sphereData[ptr].y = this.sphereOriginal[ptr].y + .1 * Math.max(0., trackTime - 40 - j * 2.3);
+      this.sphereData[ptr].y = this.sphereOriginal[ptr].y + .1 * Math.max(0., (trackTime - 37 - j )* 2);
       this.sphereGroup.geometry.attributes.offset.array[j * 3 + 1] = this.sphereData[ptr].y;
     }
     this.sphereGroup.geometry.attributes.offset.needsUpdate = true;

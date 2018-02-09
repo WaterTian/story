@@ -15,6 +15,9 @@ export default class Backdrop {
           map: {
             value: starsmap
           },
+          mapAlpha: {
+            value: 1
+          },
           from: {
             // value: new THREE.Color(0xa1b5d7)
             value: new THREE.Color(0xfbe3df)
@@ -44,6 +47,8 @@ export default class Backdrop {
     this.backdrop.material.uniforms.from.value.setHex(bFrom);
     this.backdrop.material.uniforms.to.value.setHex(bTo);
     this.backdrop.material.uniforms.time.value = .05 * t;
+
+    this.backdrop.material.uniforms.mapAlpha.value = backdropValues.a;
 
     ground.plane.material.uniforms.backgroundColor.value.setHex(bFrom);
     spheres.sphereMaterial.uniforms.rimColor.value.setHex(bFrom);
