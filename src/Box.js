@@ -27,7 +27,6 @@ export default class Box {
     var ambient = new THREE.AmbientLight(0x888888, 1);
     this.scene.add(ambient);
     var dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    // dirLight.color.setHSL(0.1, 1, 0.95);
     dirLight.position.set(1, 1.75, 1);
     this.scene.add(dirLight);
 
@@ -50,6 +49,7 @@ export default class Box {
       var boxGeometry = object.children[0].geometry;
       That.mesh = new THREE.Mesh(boxGeometry, That.Material);
       That.obj.add(That.mesh);
+      That.obj.scale.set(.7,.7,.7);
     });
 
 
@@ -306,18 +306,12 @@ export default class Box {
   }
 
 
-  render(trackTime, toPosition, ground) {
+  render(trackTime, toPosition) {
 
-    if (toPosition && trackTime > 10) {
+    if (toPosition && trackTime > 20) {
 
       this.position.lerp(toPosition,0.1);
       this.obj.lookAt(toPosition);
-
-      if (this.position.y < 0) {
-        ground.setAlpha(1 + this.position.y);
-      } else {
-        ground.setAlpha(1);
-      }
 
     }
 

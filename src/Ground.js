@@ -179,12 +179,12 @@ export default class Ground {
     }
   }
 
-  render(renderer, t, lightPosition, backgroundColor, trailColor, spheres) {
+  render(trackTime, renderer, t, lightPosition, backgroundColor, trailColor, spheres) {
 
     for (var j = 0; j < this.footprints.length; j++) {
       var f = this.footprints[j];
       var s = f.z + t;
-      s %= 10;
+      if (trackTime < 18)s %= 10;
       f.mesh.position.x = -f.x;
       f.mesh.position.z = -s;
       f.mesh.material.uniforms.offset.value.x = f.x;

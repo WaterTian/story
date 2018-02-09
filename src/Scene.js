@@ -19,6 +19,7 @@ const Backdrop = require('./Backdrop').default;
 const Particles = require('./Particles').default;
 const Spheres = require('./Spheres').default;
 const TitleCard = require('./TitleCard').default;
+const City = require('./City').default;
 
 const Box = require('./Box').default;
 
@@ -44,7 +45,7 @@ var soundPanVol;
 
 var startTime = 0; //debug for player
 
-var globalSpeed = .45;
+var globalSpeed = .6;
 var lastTrackTime = 0;
 var t = 0;
 var lastTime = 0;
@@ -56,6 +57,10 @@ export default class Scene {
 	constructor() {
 		That = this;
 		this.loadSound();
+
+		// this.vconsole = new VConsole();
+		// this.stats = new Stats();
+		// document.body.appendChild(this.stats.dom);
 	}
 
 
@@ -90,10 +95,6 @@ export default class Scene {
 	}
 
 	init() {
-		this.vconsole = new VConsole();
-
-		this.stats = new Stats();
-		document.body.appendChild(this.stats.dom);
 
 		container = document.getElementById('webglContainer');
 
@@ -119,7 +120,7 @@ export default class Scene {
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFShadowMap;
 
-		
+
 		container.appendChild(this.renderer.domElement);
 
 
@@ -157,7 +158,7 @@ export default class Scene {
 	onWindowResized() {
 		var w = container.clientWidth;
 		var h = container.clientHeight;
-		
+
 		That.renderer.setSize(w, h);
 
 		That.camera.aspect = w / h;
@@ -204,7 +205,10 @@ export default class Scene {
 		That.spheres = new Spheres(globalSpeed);
 		That.scene.add(That.spheres.sphereGroup);
 
-		That.box = new Box(this.renderer,this.scene);
+		That.city = new City(globalSpeed);
+		That.scene.add(That.city.cityGroup);
+
+		That.box = new Box(this.renderer, this.scene);
 		That.scene.add(That.box.obj);
 		That.scene.add(That.box.trail);
 
@@ -295,7 +299,9 @@ export default class Scene {
 		var delta = t - lastTime;
 		var percent = trackTime / soundPlayer.buffer.duration;
 
-		if (trackTime > soundPlayer.buffer.duration) trackTime = soundPlayer.buffer.duration;
+		// console.log(trackTime);
+
+		// if (trackTime > soundPlayer.buffer.duration) trackTime = soundPlayer.buffer.duration;
 
 
 		var renderCamera = this.camera;
@@ -303,8 +309,10 @@ export default class Scene {
 		if (!this.controls) {
 			var cameraValues = timeLine.getValues(timeLine.cameraScript, trackTime);
 
-			cameraValues.tx += -mouse.x;
-			cameraValues.ty += mouse.y;
+			if (trackTime > 20) {
+				cameraValues.tx += -mouse.x;
+				cameraValues.ty += mouse.y;
+			}
 
 			var targetPosition = new THREE.Vector3(cameraValues.x + cameraValues.tx, cameraValues.y + cameraValues.ty, cameraValues.z + cameraValues.tz);
 			renderCamera.target.lerp(targetPosition, .1);
@@ -343,15 +351,23 @@ export default class Scene {
 		if (this.stats) this.stats.update();
 
 		this.box.render(trackTime, boxPostion, this.ground);
-		this.box.renderTrail(t, delta);
-
+		if (trackTime > 62) this.box.renderTrail(t, delta);
 
 		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
-		this.ground.render(this.renderer, t, That.box.position, backgroundColor, _trailColor, this.spheres);
+		this.ground.render(trackTime,this.renderer, t, That.box.position, backgroundColor, _trailColor, this.spheres);
 		this.particles.render(trackTime, t, delta, percent, snowValues, this.spheres.sphereSnowValues, _trailColor, That.box.position, trailValues);
 		this.spheres.render(trackTime, t, backgroundColor);
+		this.city.render(trackTime, t, backgroundColor);
 		this.titleCard.render(renderCamera, titleValues);
 
+
+
+		if (this.box.position.y < 0) {
+			this.ground.setAlpha(1 + this.box.position.y);
+			this.city.setAlpha(1 + this.box.position.y);
+		} else {
+			this.city.setAlpha(1);
+		}
 
 
 		this.renderer.render(this.scene, renderCamera, baseFBO);

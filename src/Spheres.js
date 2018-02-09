@@ -53,8 +53,8 @@ export default class Spheres {
       new THREE.Color(0xdda1ff)
     ];
 
-    var g = new THREE.BoxBufferGeometry(.6, .8, 1);
-    // var g = new THREE.IcosahedronBufferGeometry(1, 3);
+    // var g = new THREE.BoxBufferGeometry(.6, .8, 1);
+    var g = new THREE.IcosahedronBufferGeometry(1, 3);
     
     var geometry = new THREE.InstancedBufferGeometry();
     geometry.index = g.index;
@@ -80,7 +80,7 @@ export default class Spheres {
       transparent: true
     })
 
-    var start = 1 * 60 + 14.5 + 2;
+    var start = 30 + 14.5 + 2;
     var patternLength = 9.25;
     var sequenceLength = 2;
 
@@ -89,10 +89,10 @@ export default class Spheres {
     var colors = [];
     var sizes = [];
 
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 3; i++) {
       for (var j = 0; j < 3; j++) {
         for( var k = 0; k < 3; k++ ) {
-        var r = Maf.randomInRange(1, 3);
+        var r = Maf.randomInRange(1, 4);
         if (Math.random() > .5) r *= -1;
         var p = new THREE.Vector3(
           r,
@@ -155,7 +155,7 @@ export default class Spheres {
     for (var j = 0; j < sphereBeats.length; j++) {
       var l = sphereBeats[j];
       for (var k = 0; k < l.length; k++) {
-        var tt = l[k];
+        var tt = l[k]-34;
         if (adjustedT >= tt && adjustedT <= tt + .3) {
           beats.push({
             id: j,
@@ -168,7 +168,7 @@ export default class Spheres {
   }
 
   render(trackTime, t, backgroundColor) {
-    var tt = Math.max(0, trackTime - 94);
+    var tt = Math.max(0, trackTime - 44);
     var v = tt / 30;
     this.sphereGroup.material.uniforms.emissive.value = v;
 
@@ -194,7 +194,7 @@ export default class Spheres {
 
     for (var j = 0; j < this.sphereData.length; j++) {
       var ptr = j;
-      this.sphereData[ptr].y = this.sphereOriginal[ptr].y + .1 * Math.max(0., trackTime - 80 - j * 2.3);
+      this.sphereData[ptr].y = this.sphereOriginal[ptr].y + .1 * Math.max(0., trackTime - 40 - j * 2.3);
       this.sphereGroup.geometry.attributes.offset.array[j * 3 + 1] = this.sphereData[ptr].y;
     }
     this.sphereGroup.geometry.attributes.offset.needsUpdate = true;

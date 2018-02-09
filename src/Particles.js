@@ -196,7 +196,7 @@ export default class Particles {
     var prev = new Float32Array(width * height * 4);
 
     var ptr = 0;
-    var radius = 3;
+    var radius = 1;
     var tmp = new THREE.Vector3();
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
@@ -344,7 +344,7 @@ export default class Particles {
 
 
     ////////////////////////////////////
-    if (trackTime < 20) {
+    if (trackTime < 16) {
       this.trail.position.z = -10;
     } else {
       this.trail.position.z = 0;

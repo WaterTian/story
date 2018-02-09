@@ -92,5 +92,5 @@ void main() {
 
   vec3 c = texture2D(map,vUv).rgb;
 
-	gl_FragColor = vec4(c*vColor+.2*(.5-n),1.);
+	gl_FragColor = vec4(vColor+.2*(.5-n),1.);
 }
