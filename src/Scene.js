@@ -40,9 +40,7 @@ var intersectionPlane;
 
 var orientation = new THREE.Vector2(0, 0);
 
-
-var track = new Audio();
-
+var startAudio;
 var soundPlayer;
 var toneMeter;
 var soundPanVol;
@@ -54,6 +52,7 @@ var lastTrackTime = 0;
 var t = 0;
 var lastTime = 0;
 
+var svgLine = document.getElementById('soundSVG');
 
 
 var endDiv;
@@ -63,19 +62,14 @@ var timeLine = new TimeLine();
 export default class Scene {
 	constructor() {
 		That = this;
-		// this.loadSound();
 		endDiv = document.getElementById('end');
 
-		// this.vconsole = new VConsole();
+		// // this.vconsole = new VConsole();
 		// this.stats = new Stats();
 		// document.body.appendChild(this.stats.dom);
 
-		//sound
-		track.src = 'assets/bg2.mp3';
-		track.controls = false;
-		container.appendChild(track);
+		this.loadSound();
 
-		this.initStart();
 	}
 
 
@@ -87,31 +81,40 @@ export default class Scene {
 		soundPlayer.connect(soundPanVol);
 		soundPanVol.toMaster();
 
-		toneMeter = new Tone.Meter();
+		// toneMeter = new Tone.Meter();
+		toneMeter = new Tone.Waveform(64);
 		soundPlayer.connect(toneMeter);
 		toneMeter.toMaster();
+
+
+		startAudio = new Audio();
+		startAudio.controls = false;
+		container.appendChild(startAudio);
+		startAudio.src = "./assets/start_btn.mp3";
 	}
 
 	initStart() {
-		var startDiv = document.getElementById('start');
-		startDiv.style.display = 'block';
+
+		loadingOut();
+		var startDiv = document.getElementById('svgCanvas');
 		startDiv.addEventListener('click', startPlaying);
 
+
 		function startPlaying() {
-			startDiv.removeEventListener('click', startPlaying);
-			startDiv.style.display = 'none';
+	        startDiv.setAttribute('class', 'loadingOut');
+	        setTimeout(function() {
+	            clearInterval(window.siv);
+	        }, 2000);
 
+			startAudio.play();
 
-			// soundPlayer.start();
-			// startTime = soundPlayer.now();
-			// console.log(soundPlayer);
-			// console.log(soundPlayer.now());
-			// console.log(soundPlayer.buffer.duration);
-
-			track.play();
+			soundPlayer.start();
+			startTime = soundPlayer.now();
+			console.log(soundPlayer);
+			console.log(soundPlayer.now());
+			console.log(soundPlayer.buffer.duration);
 
 			That.init();
-			document.getElementById('loading').style.display = 'none';
 		}
 	}
 
@@ -314,14 +317,14 @@ export default class Scene {
 
 	// main animation loop
 	render() {
-		// var trackTime = soundPlayer.now() - startTime + 0;
-		var trackTime = track.cre;
+		var trackTime = soundPlayer.now() - startTime + 0;
 		t += globalSpeed * (trackTime - lastTrackTime);
 		var delta = t - lastTime;
 		var percent = trackTime / soundPlayer.buffer.duration;
 
+		soundPanVol.pan.value = mouse.x;
 
-		if (trackTime > 130) return;
+
 		// console.log(trackTime);
 
 
@@ -354,8 +357,6 @@ export default class Scene {
 		}
 
 
-		soundPanVol.pan.value = mouse.x;
-
 
 		raycaster.setFromCamera(mouse, renderCamera);
 		intersectionPlane.lookAt(renderCamera.position);
@@ -377,10 +378,22 @@ export default class Scene {
 		var trailValues = timeLine.getValues(timeLine.trailScript, trackTime);
 
 
-		var soundLevel = toneMeter.getLevel();
-		soundLevel = Tone.dbToGain(soundLevel);
-		if (soundLevel > 1) {
-			this.city.flash(soundLevel);
+
+		var soundValue = toneMeter.getValue();
+		// console.log(soundValue);
+
+		var path;
+		for (var i = 0; i < 64; i++) {
+			var _y = soundValue[i] * 20 + 32;
+			if (i == 0) path = "M0 " + _y;
+			path += "L" + i + " ";
+			path +=  _y+ " ";
+		}
+		svgLine.setAttribute('d', path);
+
+
+		if (soundValue[0] > 1) {
+			this.city.flash(soundValue[0]);
 		}
 
 

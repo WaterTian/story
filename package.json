@@ -19,6 +19,7 @@
     "pixi-sound": "^2.0.1",
     "pixi.js": "^4.7.0",
     "stats.js": "^0.17.0",
+    "svg.js": "^2.6.4",
     "three": "^0.89.0",
     "three-orbit-controls": "^82.1.0",
     "tone": "^0.11.11",

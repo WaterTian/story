@@ -119,7 +119,7 @@ export default class TimeLine {
 
     titleScript.addKeyframe({opacity:0, y:-.5, title:2}, 105);
     titleScript.addKeyframe({opacity:1, y:0, title:2}, 109);
-    titleScript.addKeyframe({opacity:0, y:.5, title:2}, 112);
+    titleScript.addKeyframe({opacity:0, y:.5, title:2}, 115);
     titleScript.addKeyframe({opacity:0, y:.5, title:2}, 130);
     this.titleScript = titleScript;
 
