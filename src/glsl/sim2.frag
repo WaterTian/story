@@ -160,7 +160,7 @@ void main() {
 		s.a = source.a;
 	}else{
 		s.xyz += delta * speed * curlNoise( .1 * s.xyz);
-		s.z -= .01 * delta;
+		s.z -= .02 * delta;
 		s.w -= decay * delta;
 	}
 	gl_FragColor = s;

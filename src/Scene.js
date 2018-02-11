@@ -303,7 +303,7 @@ export default class Scene {
 
 	// main animation loop
 	render() {
-		var trackTime = soundPlayer.now() - startTime + 0;
+		var trackTime = soundPlayer.now() - startTime + 60;
 		t += globalSpeed * (trackTime - lastTrackTime);
 		var delta = t - lastTime;
 		var percent = trackTime / soundPlayer.buffer.duration;
@@ -376,7 +376,9 @@ export default class Scene {
 		if (this.stats) this.stats.update();
 
 		this.box.render(trackTime, boxPostion, this.ground);
-		if (trackTime > 62) this.box.renderTrail(t, delta);
+		if (trackTime > 62) {
+			this.box.renderTrail(t, delta);
+		}
 
 		this.backdrop.render(t, backdropValues, this.ground, this.spheres);
 		this.ground.render(trackTime, this.renderer, t, That.box.position, backgroundColor, _trailColor, this.spheres);

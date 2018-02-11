@@ -49,7 +49,7 @@ export default class Box {
       var boxGeometry = object.children[0].geometry;
       That.mesh = new THREE.Mesh(boxGeometry, That.Material);
       That.obj.add(That.mesh);
-      That.obj.scale.set(.7,.7,.7);
+      That.obj.scale.set(.7, .7, .7);
     });
 
 
@@ -107,7 +107,7 @@ export default class Box {
     var prev = new Float32Array(width * height * 4);
 
     var ptr = 0;
-    var radius = .4;
+    var radius = 1;
     var tmp = new THREE.Vector3();
     for (var y = 0; y < height; y++) {
       for (var x = 0; x < width; x++) {
@@ -222,6 +222,7 @@ export default class Box {
     this.trail.frustumCulled = false;
     this.trail.renderOrder = 5;
     this.trail.userData.name = 'Trail';
+    this.trail.position.z =.5;
 
     var trailShader = new THREE.RawShaderMaterial({
       uniforms: {
@@ -272,7 +273,7 @@ export default class Box {
     this.trailSimulation.shader.uniforms.spread.value = .6;
     this.trailSimulation.shader.uniforms.time.value = t;
     this.trailSimulation.shader.uniforms.delta.value = delta / (1 / 60.);
-    this.trailSimulation.shader.uniforms.spawn.value.lerp(this.position,0.3);
+    this.trailSimulation.shader.uniforms.spawn.value.lerp(this.position, 0.3);
 
     // this.trailSimulation.shader.uniforms.persistence.value = this.snowSimulation.shader.uniforms.persistence.value;
     // this.trailSimulation.shader.uniforms.speed.value = this.snowSimulation.shader.uniforms.speed.value;
@@ -280,9 +281,6 @@ export default class Box {
     this.trailSimulation.render();
     this.trail.material.uniforms.curPos.value = this.trailSimulation.front.texture;
     this.trail.material.uniforms.prevPos.value = this.trailSimulation.back.texture;
-
-    // this.trail.material.uniforms.opacity.value = trailValues.opacity;
-    // this.trail.material.uniforms.scale.value = trailValues.scale*2;
 
     // this.shadowCamera.position.copy(this.position);
 
@@ -310,8 +308,8 @@ export default class Box {
 
     if (toPosition && trackTime > 18) {
 
-      this.position.lerp(toPosition,0.1);
-      this.obj.lookAt(toPosition);
+      this.position.lerp(toPosition, 0.1);
+      this.obj.lookAt(this.position);
 
     }
 
