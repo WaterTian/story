@@ -56,13 +56,30 @@ var svgLine = document.getElementById('soundSVG');
 
 
 var endDiv;
+var logoDiv;
+var loadingDiv;
 
 var timeLine = new TimeLine();
 
 export default class Scene {
 	constructor() {
 		That = this;
+		logoDiv = document.getElementById('logo');
 		endDiv = document.getElementById('end');
+		loadingDiv = document.getElementById('loading');
+
+        logoDiv.addEventListener('touchmove', EventPreventDefault);
+		endDiv.addEventListener('touchmove', EventPreventDefault);
+		loadingDiv.addEventListener('touchmove', EventPreventDefault);
+		svgLine.addEventListener('touchmove', EventPreventDefault);
+		
+
+		function EventPreventDefault(event) {
+			event.preventDefault();
+		}
+
+
+
 
 		// // this.vconsole = new VConsole();
 		// this.stats = new Stats();
@@ -103,8 +120,9 @@ export default class Scene {
 		function startPlaying() {
 	        startDiv.setAttribute('class', 'loadingOut');
 	        setTimeout(function() {
+	        	loadingDiv.style.display = "none";
 	            clearInterval(window.siv);
-	        }, 2000);
+	        }, 1000);
 
 			startAudio.play();
 
