@@ -40,6 +40,9 @@ var intersectionPlane;
 
 var orientation = new THREE.Vector2(0, 0);
 
+
+var track = new Audio();
+
 var soundPlayer;
 var toneMeter;
 var soundPanVol;
@@ -60,12 +63,19 @@ var timeLine = new TimeLine();
 export default class Scene {
 	constructor() {
 		That = this;
-		this.loadSound();
+		// this.loadSound();
 		endDiv = document.getElementById('end');
 
 		// this.vconsole = new VConsole();
 		// this.stats = new Stats();
 		// document.body.appendChild(this.stats.dom);
+
+		//sound
+		track.src = 'assets/bg2.mp3';
+		track.controls = false;
+		container.appendChild(track);
+
+		this.initStart();
 	}
 
 
@@ -92,12 +102,13 @@ export default class Scene {
 			startDiv.style.display = 'none';
 
 
-			soundPlayer.start();
-			startTime = soundPlayer.now();
+			// soundPlayer.start();
+			// startTime = soundPlayer.now();
+			// console.log(soundPlayer);
+			// console.log(soundPlayer.now());
+			// console.log(soundPlayer.buffer.duration);
 
-			console.log(soundPlayer);
-			console.log(soundPlayer.now());
-			console.log(soundPlayer.buffer.duration);
+			track.play();
 
 			That.init();
 			document.getElementById('loading').style.display = 'none';
@@ -303,7 +314,8 @@ export default class Scene {
 
 	// main animation loop
 	render() {
-		var trackTime = soundPlayer.now() - startTime + 60;
+		// var trackTime = soundPlayer.now() - startTime + 0;
+		var trackTime = track.cre;
 		t += globalSpeed * (trackTime - lastTrackTime);
 		var delta = t - lastTime;
 		var percent = trackTime / soundPlayer.buffer.duration;
@@ -316,8 +328,8 @@ export default class Scene {
 
 		if (trackTime > 123) {
 			endDiv.style.display = 'block';
-			var a = (trackTime-123);
-			if(a>1)a=1;
+			var a = (trackTime - 123);
+			if (a > 1) a = 1;
 			endDiv.style.opacity = a;
 		}
 
