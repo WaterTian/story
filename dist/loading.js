@@ -444,8 +444,8 @@ Class(function Noise() {
 
 
 function LoaderUICircle() {
-    var _size = 80;
-    var _canvasSize = 80;
+    var _size = 90;
+    var _canvasSize = 90;
     var _draw = [];
     var _vertices = [];
 
@@ -501,14 +501,14 @@ function LoaderUICircle() {
         for (let i = 0; i < _vertices.length; i++) {
 
             var v = _vertices[i];
-            let random = Noise.perlin2(px, py) * 1.5;
+            let random = Noise.perlin2(px, py) *2;
             let x = radius * Math.cos(angle) + random + _canvasSize / 2;
             let y = radius * Math.sin(angle) + random + _canvasSize / 2;
             v.x = x;
             v.y = y;
             angle += inc;
-            px += .17;
-            py += .17;
+            px += 0.5;
+            py += 0.5;
 
             if (i == 0) {
                 path.push("M" + _draw[i].x + " " + _draw[i].y);
@@ -555,6 +555,6 @@ function LoaderUICircle() {
 new LoaderUICircle();
 
 function loadingOut() {
-    document.getElementById('erji').setAttribute('class', 'erjiOut');
+    document.getElementById('mic').setAttribute('class', 'micOut');
     document.getElementById('start').setAttribute('class', 'fadein');
 }

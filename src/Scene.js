@@ -40,6 +40,7 @@ var intersectionPlane;
 
 var orientation = new THREE.Vector2(0, 0);
 
+var loadingAudio;
 var startAudio;
 var soundPlayer;
 var toneMeter;
@@ -68,16 +69,15 @@ export default class Scene {
 		endDiv = document.getElementById('end');
 		loadingDiv = document.getElementById('loading');
 
-        logoDiv.addEventListener('touchmove', EventPreventDefault);
+		logoDiv.addEventListener('touchmove', EventPreventDefault);
 		endDiv.addEventListener('touchmove', EventPreventDefault);
 		loadingDiv.addEventListener('touchmove', EventPreventDefault);
 		svgLine.addEventListener('touchmove', EventPreventDefault);
-		
+
 
 		function EventPreventDefault(event) {
 			event.preventDefault();
 		}
-
 
 
 
@@ -108,6 +108,17 @@ export default class Scene {
 		startAudio.controls = false;
 		container.appendChild(startAudio);
 		startAudio.src = "./assets/start_btn.mp3";
+
+		loadingAudio = new Audio();
+		loadingAudio.controls = false;
+		loadingAudio.loop = true;
+		container.appendChild(loadingAudio);
+		loadingAudio.src = "./assets/bg1.mp3";
+		loadingAudio.play();
+
+		document.getElementById('svgCanvas').addEventListener('click', function() {
+			loadingAudio.play();
+		});
 	}
 
 	initStart() {
@@ -116,23 +127,24 @@ export default class Scene {
 		var startDiv = document.getElementById('svgCanvas');
 		startDiv.addEventListener('click', startPlaying);
 
+		That.init();
+
 
 		function startPlaying() {
-	        startDiv.setAttribute('class', 'loadingOut');
-	        setTimeout(function() {
-	        	loadingDiv.style.display = "none";
-	            clearInterval(window.siv);
-	        }, 1000);
+			startDiv.setAttribute('class', 'loadingOut');
+			setTimeout(function() {
+				loadingDiv.style.display = "none";
+				clearInterval(window.siv);
+			}, 1000);
 
 			startAudio.play();
-
 			soundPlayer.start();
 			startTime = soundPlayer.now();
 			console.log(soundPlayer);
 			console.log(soundPlayer.now());
 			console.log(soundPlayer.buffer.duration);
 
-			That.init();
+			That.animate();
 		}
 	}
 
@@ -180,7 +192,6 @@ export default class Scene {
 
 
 		this.initScene();
-		this.animate();
 		this.onWindowResized();
 
 	}
@@ -405,7 +416,7 @@ export default class Scene {
 			var _y = soundValue[i] * 20 + 32;
 			if (i == 0) path = "M0 " + _y;
 			path += "L" + i + " ";
-			path +=  _y+ " ";
+			path += _y + " ";
 		}
 		svgLine.setAttribute('d', path);
 

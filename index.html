@@ -75,16 +75,16 @@
             -webkit-transform:translate(-50%,-50%);
             transform:translate(-50%,-50%);
         }
-        .erji{
+        .mic{
             opacity:0;
             -webkit-transform-origin:center center;
             transform-origin:center center;
-            -webkit-animation: scaleerji 2s linear 1 normal;
-            animation: scaleerji 2s linear 1 normal;
+            -webkit-animation: scalemic 2s linear 1 normal;
+            animation: scalemic 2s linear 1 normal;
             -webkit-animation-fill-mode:forwards;
             animation-fill-mode:forwards;
         }
-        @-webkit-keyframes scaleerji {
+        @-webkit-keyframes scalemic {
             0%{
                 opacity:0;
             }
@@ -92,7 +92,7 @@
                 opacity:1;
             }
         }
-        .erjiOut{
+        .micOut{
             -webkit-transform-origin:center center;
             transform-origin:center center;
             -webkit-animation: out 1s linear 1 normal;
@@ -157,8 +157,8 @@
         .loadingOut{
             -webkit-transform-origin:center center;
             transform-origin:center center;
-            -webkit-animation: scale 1s ease-out 1 normal;
-            animation: scale 1s ease-out 1 normal;
+            -webkit-animation: scale 2s ease-out 1 normal;
+            animation: scale 2s ease-out 1 normal;
             -webkit-animation-fill-mode:forwards;
             animation-fill-mode:forwards;
 
@@ -202,20 +202,22 @@
 
 
         <div class="loading-view" id="loading"">
-            <svg id="svgCanvas" width="80" height="80" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
-                <g id="erji" class="erji" transform="translate(15,15)">
+            <svg id="svgCanvas" width="90" height="90" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90">
+                <g id="mic" class="mic" transform="translate(20,20)">
                     <path fill="white" d="M25,0C11.22,0,0,10.07,0,22.43V36.61H1.51V22.43C1.51,10.91,12.06,1.51,25,1.51s23.49,9.37,23.49,20.92V36.61H50V22.43C50,10.07,38.81,0,25,0Z"/>
                     <path fill="white" d="M45,30.56V29a2,2,0,0,0-2-2H41.35a2,2,0,0,0-2,2V42.93a2,2,0,0,0,2,2H43a2,2,0,0,0,2-2V41.35a1.69,1.69,0,0,0,1-1.57V32.13A1.75,1.75,0,0,0,45,30.56Z"/>
                     <path fill="white" d="M8.68,27.06H7a2,2,0,0,0-2,2v1.57a1.7,1.7,0,0,0-1,1.57v7.65a1.74,1.74,0,0,0,1,1.57V43a2,2,0,0,0,2,2H8.68a2,2,0,0,0,2-2V29A2,2,0,0,0,8.68,27.06Z"/>
                 </g>
-                <path class="erji" id="Path" fill="none" stroke="#999999" stroke-width="2" stroke-linejoin="round"></path>
-                <g id="start" transform="translate(18,0)">
-                    <text x="0" y="45" class="s">s</text>
-                    <text x="9" y="45" class="t">t</text>
-                    <text x="17" y="45" class="a">a</text>
-                    <text x="28" y="45" class="r">r</text>
-                    <text x="37" y="45" class="t">t</text>
+                
+                <g id="start" transform="translate(21,0)">
+                    <text x="0" y="48" class="s">S</text>
+                    <text x="10" y="48" class="t">T</text>
+                    <text x="20" y="48" class="a">A</text>
+                    <text x="30" y="48" class="r">R</text>
+                    <text x="40" y="48" class="t">T</text>
                 </g>
+
+                <path id="Path" fill="none" stroke="#999999" stroke-width="2" stroke-linejoin="round"></path>
             </svg>
         </div>
 
@@ -225,5 +227,66 @@
 
         <script src="dist/loading.js"></script>
         <script src="dist/app.js?v=0.0.1"></script>
+
+
+
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        <script>
+
+            function configWxShare(a){
+                wx.config({
+                    debug: false,
+                    appId: a.appid,
+                    timestamp: a.timestamp,
+                    nonceStr: a.nonceStr,
+                    signature: a.signature,
+                    jsApiList: [
+                        'checkJsApi',
+                        'onMenuShareTimeline',
+                        'onMenuShareAppMessage',
+                        'onMenuShareQQ',
+                        'onMenuShareWeibo'
+                    ]
+                });
+                //分享地址
+                var sharePath=a.url;
+                //分享图像
+                var shareImg="http://h5n.180china.com/lab/story/assets/share.jpg";
+                wx.ready(function(){
+                    // 分享到朋友圈
+                    wx.onMenuShareTimeline({
+                        title: '新春快乐', // 分享标题
+                        link: sharePath, // 分享链接
+                        imgUrl: shareImg, // 分享图标
+                        success: function () { },
+                        cancel: function () { }
+                    });
+                    //分享给朋友
+                    wx.onMenuShareAppMessage({
+                        title: '新春快乐', // 分享标题
+                        desc: 'JOY把年货和祝福带回家', // 分享描述
+                        link: sharePath, // 分享链接
+                        imgUrl: shareImg, // 分享图标
+                        type: 'link', // 分享类型,music、video或link，不填默认为link
+                        dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                        success: function () {},
+                        cancel: function () {}
+                    });
+                });
+            }
+
+            $.ajax({
+                url: '/wx-help/get-wx-config',
+                type: "POST",
+                dataType:"json",
+                success: function (msg) {
+                    configWxShare(msg);
+                }
+            });
+
+        </script>
+
     </body>
 </html>
