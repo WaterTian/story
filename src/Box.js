@@ -57,6 +57,11 @@ export default class Box {
 
   }
 
+  joyScale(s)
+  {
+    this.obj.scale.set(s, s, s);
+  }
+
 
 
   initTrail() {

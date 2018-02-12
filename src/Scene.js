@@ -94,7 +94,7 @@ export default class Scene {
 
 		soundPlayer = new Tone.Player("./assets/bg2.mp3", this.initStart);
 
-		soundPanVol = new Tone.PanVol(0, -5);
+		soundPanVol = new Tone.PanVol(0, 10);
 		soundPlayer.connect(soundPanVol);
 		soundPanVol.toMaster();
 
@@ -352,7 +352,7 @@ export default class Scene {
 		var percent = trackTime / soundPlayer.buffer.duration;
 
 		soundPanVol.pan.value = mouse.x;
-
+		soundPlayer.volume.value = -(mouse.y+1)*10;
 
 		// console.log(trackTime);
 
@@ -409,21 +409,25 @@ export default class Scene {
 
 
 		var soundValue = toneMeter.getValue();
-		// console.log(soundValue);
+		var soundFFT = Math.abs(soundValue[0]);
 
 		var path;
 		for (var i = 0; i < 64; i++) {
-			var _y = soundValue[i] * 20 + 32;
+			var _y = soundValue[i] * 50 + 32;
 			if (i == 0) path = "M0 " + _y;
 			path += "L" + i + " ";
 			path += _y + " ";
 		}
 		svgLine.setAttribute('d', path);
 
-
-		if (soundValue[0] > 1) {
-			this.city.flash(soundValue[0]);
+		// console.log(soundFFT);
+		if (soundFFT > .1) {
+			// console.log(soundFFT);
+			this.city.flash(soundFFT*6);
+			this.box.joyScale(soundFFT*0.6+0.7);
 		}
+
+
 
 
 

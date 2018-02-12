@@ -120,6 +120,8 @@ export default class City {
     this.cityGroup.geometry.attributes.color.array[Math.floor(Math.random() * this.cityLight.length)] = level;
     this.cityGroup.geometry.attributes.color.array[Math.floor(Math.random() * this.cityLight.length)] = level;
     this.cityGroup.geometry.attributes.color.array[Math.floor(Math.random() * this.cityLight.length)] = level;
+    this.cityGroup.geometry.attributes.color.array[Math.floor(Math.random() * this.cityLight.length)] = level;
+    this.cityGroup.geometry.attributes.color.array[Math.floor(Math.random() * this.cityLight.length)] = level;
     this.cityGroup.geometry.attributes.color.needsUpdate = true;
 
   }
