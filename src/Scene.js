@@ -64,6 +64,13 @@ var timeLine = new TimeLine();
 
 export default class Scene {
 	constructor() {
+
+		this.vconsole = new VConsole();
+		this.stats = new Stats();
+		document.body.appendChild(this.stats.dom);
+
+
+
 		That = this;
 		logoDiv = document.getElementById('logo');
 		endDiv = document.getElementById('end');
@@ -79,14 +86,7 @@ export default class Scene {
 			event.preventDefault();
 		}
 
-
-
-		// // this.vconsole = new VConsole();
-		// this.stats = new Stats();
-		// document.body.appendChild(this.stats.dom);
-
 		this.loadSound();
-
 	}
 
 
@@ -140,9 +140,9 @@ export default class Scene {
 			startAudio.play();
 			soundPlayer.start();
 			startTime = soundPlayer.now();
-			console.log(soundPlayer);
-			console.log(soundPlayer.now());
-			console.log(soundPlayer.buffer.duration);
+			// console.log(soundPlayer);
+			// console.log(soundPlayer.now());
+			// console.log(soundPlayer.buffer.duration);
 
 			That.animate();
 		}
